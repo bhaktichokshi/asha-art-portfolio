@@ -16,238 +16,213 @@
       font-family: 'DM Sans', sans-serif;
     }
 
-    canvas {
-      position: fixed;
-      inset: 0;
-      z-index: 0;
-      display: block;
-    }
+    canvas { position: fixed; inset: 0; z-index: 0; display: block; }
 
-    /* ── Landing / Glass Door ─────────────────────────────────────── */
+    /* ── Landing / Glass Door ──────────────────────────────────── */
     #landing {
-      position: fixed;
-      inset: 0;
-      z-index: 20;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      background: linear-gradient(160deg, rgba(8,4,2,0.4) 0%, rgba(20,10,4,0.55) 100%);
+      position: fixed; inset: 0; z-index: 20;
+      display: flex; align-items: center; justify-content: center;
+      background: linear-gradient(160deg, rgba(6,3,1,0.38) 0%, rgba(18,9,3,0.52) 100%);
       transition: opacity 0.8s ease;
     }
     #landing.fade-out { opacity: 0; pointer-events: none; }
 
     #door-surround {
       position: relative;
-      width: min(400px, 82vw);
+      width: min(380px, 80vw);
       height: min(580px, 80vh);
       perspective: 2400px;
     }
-
-    /* decorative outer frame */
+    /* outer decorative frame — no sign above */
     #door-surround::before {
       content: '';
-      position: absolute;
-      inset: -14px;
-      border: 1.5px solid rgba(196,122,69,0.45);
+      position: absolute; inset: -14px;
+      border: 1.5px solid rgba(196,122,69,0.42);
       pointer-events: none;
     }
     #door-surround::after {
       content: '';
-      position: absolute;
-      inset: -22px;
-      border: 1px solid rgba(196,122,69,0.18);
+      position: absolute; inset: -22px;
+      border: 1px solid rgba(196,122,69,0.16);
       pointer-events: none;
     }
 
-    #gallery-sign {
-      position: absolute;
-      top: -42px;
-      left: 50%;
-      transform: translateX(-50%);
-      font-size: 0.65rem;
-      letter-spacing: 0.35em;
-      text-transform: uppercase;
-      color: rgba(196,122,69,0.85);
-      white-space: nowrap;
-    }
-
     .door-panel {
-      position: absolute;
-      top: 0;
-      width: 50%;
-      height: 100%;
-      background: rgba(255,248,235,0.06);
-      backdrop-filter: blur(22px) saturate(0.55) brightness(1.08);
-      -webkit-backdrop-filter: blur(22px) saturate(0.55) brightness(1.08);
-      border: 1px solid rgba(255,245,220,0.18);
-      transition: transform 1.05s cubic-bezier(0.4, 0, 0.2, 1);
+      position: absolute; top: 0;
+      width: 50%; height: 100%;
+      background: rgba(255,250,240,0.055);
+      backdrop-filter: blur(20px) saturate(0.5) brightness(1.1);
+      -webkit-backdrop-filter: blur(20px) saturate(0.5) brightness(1.1);
+      border: 1px solid rgba(255,248,228,0.17);
+      transition: transform 1.1s cubic-bezier(0.4,0,0.2,1);
       transform-style: preserve-3d;
     }
-
-    /* thin vertical dividers on glass panels */
-    .door-panel::before {
-      content: '';
-      position: absolute;
-      top: 10%;
-      bottom: 10%;
-      width: 1px;
-      background: rgba(255,245,220,0.12);
-    }
-
-    #door-left {
-      left: 0;
-      border-right: none;
-      transform-origin: left center;
-    }
-    #door-left::before { right: 33%; }
-
-    #door-right {
-      right: 0;
-      border-left: none;
-      transform-origin: right center;
-    }
-    #door-right::before { left: 33%; }
-
+    #door-left  { left: 0;  border-right: none; transform-origin: left center; }
+    #door-right { right: 0; border-left: none;  transform-origin: right center; }
     #door-left.open  { transform: perspective(2400px) rotateY(-87deg); }
     #door-right.open { transform: perspective(2400px) rotateY(87deg); }
 
     .door-handle {
-      position: absolute;
-      top: 50%;
-      width: 5px;
-      height: 36px;
-      background: rgba(196,122,69,0.55);
+      position: absolute; top: 50%;
+      width: 5px; height: 34px;
+      background: rgba(196,122,69,0.5);
       border-radius: 3px;
       transform: translateY(-50%);
     }
-    #door-left  .door-handle { right: 12px; }
-    #door-right .door-handle { left: 12px; }
+    #door-left  .door-handle { right: 11px; }
+    #door-right .door-handle { left: 11px; }
 
+    /* Text spans full height of the glass */
     #door-content {
-      position: absolute;
-      inset: 0;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
-      gap: 0.7rem;
-      padding: 2rem;
-      z-index: 2;
-      text-align: center;
+      position: absolute; inset: 0;
+      display: flex; flex-direction: column;
+      align-items: center; justify-content: space-between;
+      padding: 9% 1.8rem 8%;
+      z-index: 2; text-align: center;
+      pointer-events: none;
     }
 
+    .dc-top {
+      display: flex; flex-direction: column;
+      align-items: center; gap: 0.55rem;
+    }
+    .dc-artworks {
+      font-size: 0.62rem;
+      letter-spacing: 0.38em;
+      text-transform: uppercase;
+      color: rgba(196,122,69,0.82);
+    }
+    .dc-rule {
+      width: 48px; height: 1px;
+      background: rgba(196,122,69,0.35);
+    }
+
+    .dc-mid {
+      display: flex; flex-direction: column;
+      align-items: center; gap: 0.55rem;
+    }
+    .dc-by {
+      font-family: 'Playfair Display', serif;
+      font-style: italic;
+      font-size: 0.85rem;
+      color: rgba(248,240,227,0.65);
+    }
     #door-content h1 {
       font-family: 'Playfair Display', serif;
-      font-size: clamp(1.5rem, 5.5vw, 2.1rem);
+      font-size: clamp(1.45rem, 5vw, 2rem);
       font-weight: 600;
       color: #F8F0E3;
       line-height: 1.2;
-      text-shadow: 0 2px 16px rgba(0,0,0,0.6);
-      pointer-events: none;
+      text-shadow: 0 2px 18px rgba(0,0,0,0.55);
     }
-
-    .journey-label {
-      font-size: 0.72rem;
-      letter-spacing: 0.22em;
+    .dc-journey {
+      font-size: 0.7rem;
+      letter-spacing: 0.2em;
       text-transform: uppercase;
-      color: rgba(196,122,69,0.9);
-      pointer-events: none;
+      color: rgba(196,122,69,0.75);
+      margin-top: 0.15rem;
     }
 
+    .dc-bot {
+      display: flex; flex-direction: column;
+      align-items: center; gap: 0.65rem;
+      pointer-events: all;
+    }
+    .dc-nudge {
+      font-size: 0.74rem;
+      letter-spacing: 0.1em;
+      color: rgba(248,240,227,0.5);
+      pointer-events: none;
+    }
     #enter-btn {
-      margin-top: 1rem;
-      padding: 0.6rem 1.5rem;
+      padding: 0.55rem 1.4rem;
       background: rgba(196,122,69,0.12);
-      border: 1px solid rgba(196,122,69,0.5);
+      border: 1px solid rgba(196,122,69,0.48);
       color: #F8F0E3;
       font-family: 'DM Sans', sans-serif;
-      font-size: 0.82rem;
+      font-size: 0.8rem;
       letter-spacing: 0.14em;
       cursor: pointer;
       transition: background 0.2s, border-color 0.2s;
     }
     #enter-btn:hover {
-      background: rgba(196,122,69,0.28);
-      border-color: rgba(196,122,69,0.75);
+      background: rgba(196,122,69,0.26);
+      border-color: rgba(196,122,69,0.7);
     }
+    .dc-email {
+      font-size: 0.68rem;
+      letter-spacing: 0.07em;
+      color: rgba(196,122,69,0.62);
+      text-decoration: none;
+      border-bottom: 1px solid rgba(196,122,69,0.25);
+      padding-bottom: 1px;
+      pointer-events: all;
+    }
+    .dc-email:hover { color: rgba(196,122,69,0.9); }
 
-    /* ── Post-entry UI ────────────────────────────────────────────── */
-    #controls-hint {
+    /* ── Hint bar ─────────────────────────────────────────────── */
+    #hint {
       display: none;
-      position: fixed;
-      bottom: 22px;
-      left: 50%;
-      transform: translateX(-50%);
+      position: fixed; bottom: 20px;
+      left: 50%; transform: translateX(-50%);
       z-index: 30;
-      color: rgba(248,240,227,0.7);
-      font-size: 0.73rem;
-      letter-spacing: 0.06em;
-      background: rgba(15,8,3,0.6);
-      padding: 0.45rem 1.1rem;
-      white-space: nowrap;
-      pointer-events: none;
+      color: rgba(245,238,227,0.68);
+      font-size: 0.72rem; letter-spacing: 0.06em;
+      background: rgba(14,7,3,0.58);
+      padding: 0.4rem 1rem;
+      white-space: nowrap; pointer-events: none;
     }
 
-    #crosshair {
-      display: none;
-      position: fixed;
-      top: 50%; left: 50%;
-      transform: translate(-50%, -50%);
-      z-index: 30;
-      color: rgba(248,240,227,0.55);
-      font-size: 1.4rem;
-      pointer-events: none;
-      line-height: 1;
+    /* ── Info panel ───────────────────────────────────────────── */
+    #info-panel {
+      position: fixed; bottom: -260px; right: 22px;
+      width: 270px;
+      background: rgba(244,238,228,0.96);
+      backdrop-filter: blur(10px);
+      -webkit-backdrop-filter: blur(10px);
+      border: 1px solid rgba(196,122,69,0.28);
+      padding: 1.1rem 1.2rem 1.2rem;
+      z-index: 35;
+      transition: bottom 0.42s cubic-bezier(0.4,0,0.2,1);
     }
-
-    #lock-overlay {
-      display: none;
-      position: fixed;
-      inset: 0;
-      z-index: 25;
-      background: rgba(8,4,2,0.72);
-      backdrop-filter: blur(5px);
-      -webkit-backdrop-filter: blur(5px);
-      align-items: center;
-      justify-content: center;
-      flex-direction: column;
-      gap: 0.5rem;
-      cursor: pointer;
+    #info-panel.visible { bottom: 22px; }
+    #info-close {
+      position: absolute; top: 8px; right: 10px;
+      background: none; border: none;
+      color: #8B6E4E; font-size: 1.1rem; cursor: pointer;
+      line-height: 1; padding: 2px 4px;
     }
-    #lock-overlay p {
-      color: #F8F0E3;
-      font-size: 1rem;
-      letter-spacing: 0.1em;
-    }
-    #lock-overlay small {
-      color: rgba(196,122,69,0.75);
-      font-size: 0.72rem;
-      letter-spacing: 0.14em;
-    }
-
-    /* ── Mobile notice ────────────────────────────────────────────── */
-    #mobile-notice {
-      display: none;
-      position: fixed;
-      inset: 0;
-      z-index: 50;
-      background: #1a0f0a;
-      color: #F8F0E3;
-      align-items: center;
-      justify-content: center;
-      flex-direction: column;
-      gap: 1rem;
-      text-align: center;
-      padding: 2rem;
-    }
-    #mobile-notice h2 {
+    #info-title {
       font-family: 'Playfair Display', serif;
-      font-size: 1.5rem;
-      color: #F8F0E3;
+      font-size: 1rem; font-weight: 600;
+      color: #3D2B1F; margin-bottom: 0.65rem;
+      padding-right: 1.2rem;
     }
-    #mobile-notice p { font-size: 0.85rem; color: #8B6E4E; line-height: 1.6; }
-    #mobile-notice a { color: #C47A45; text-decoration: none; }
+    .info-row {
+      display: flex; gap: 0.5rem;
+      font-size: 0.76rem; margin-bottom: 0.28rem;
+      color: #5C4233;
+    }
+    .info-lbl { color: #8B6E4E; min-width: 52px; }
+    #info-note {
+      margin-top: 0.7rem;
+      font-size: 0.77rem; line-height: 1.55;
+      color: #5C4233;
+      font-family: 'Playfair Display', serif;
+      font-style: italic;
+    }
 
+    /* ── Mobile ───────────────────────────────────────────────── */
+    #mobile-notice {
+      display: none; position: fixed; inset: 0; z-index: 50;
+      background: #1a0f0a; color: #F8F0E3;
+      align-items: center; justify-content: center;
+      flex-direction: column; gap: 1rem;
+      text-align: center; padding: 2rem;
+    }
+    #mobile-notice h2 { font-family: 'Playfair Display', serif; font-size: 1.5rem; }
+    #mobile-notice p  { font-size: 0.85rem; color: #8B6E4E; line-height: 1.6; }
+    #mobile-notice a  { color: #C47A45; text-decoration: none; }
     @media (max-width: 768px) and (pointer: coarse) {
       #mobile-notice { display: flex; }
     }
@@ -255,34 +230,46 @@
 </head>
 <body>
 
-  <!-- Landing -->
   <div id="landing">
     <div id="door-surround">
-      <p id="gallery-sign">Asha Chokshi Gallery</p>
       <div id="door-left" class="door-panel"><div class="door-handle"></div></div>
       <div id="door-right" class="door-panel"><div class="door-handle"></div></div>
       <div id="door-content">
-        <h1>Artworks by<br>Asha Chokshi</h1>
-        <p class="journey-label">Journey from 1972</p>
-        <button id="enter-btn">Take a look around ↗</button>
+        <div class="dc-top">
+          <p class="dc-artworks">Artworks</p>
+          <div class="dc-rule"></div>
+        </div>
+        <div class="dc-mid">
+          <p class="dc-by">by</p>
+          <h1>Asha Chokshi</h1>
+          <p class="dc-journey">Journey from 1972</p>
+        </div>
+        <div class="dc-bot">
+          <p class="dc-nudge">Take a look inside</p>
+          <button id="enter-btn">→ Enter</button>
+          <a class="dc-email" href="mailto:chokshi.asha@gmail.com">chokshi.asha@gmail.com</a>
+        </div>
       </div>
     </div>
   </div>
 
-  <!-- Gallery UI -->
-  <div id="controls-hint">Click to walk &nbsp;·&nbsp; W A S D to move &nbsp;·&nbsp; Mouse to look &nbsp;·&nbsp; ESC to pause</div>
-  <div id="crosshair">·</div>
-  <div id="lock-overlay">
-    <p>Click to resume</p>
-    <small>W A S D to walk · Mouse to look</small>
+  <!-- Artwork info panel -->
+  <div id="info-panel">
+    <button id="info-close">×</button>
+    <h3 id="info-title">—</h3>
+    <div class="info-row"><span class="info-lbl">Year</span><span id="info-year">—</span></div>
+    <div class="info-row"><span class="info-lbl">Medium</span><span id="info-medium">—</span></div>
+    <div class="info-row"><span class="info-lbl">Size</span><span id="info-size">—</span></div>
+    <p id="info-note">—</p>
   </div>
 
-  <!-- Mobile fallback -->
+  <div id="hint">Drag to look around &nbsp;·&nbsp; Click floor to walk &nbsp;·&nbsp; Click artwork for details</div>
+
   <div id="mobile-notice">
     <h2>Artworks by Asha Chokshi</h2>
     <p>Journey from 1972</p>
-    <p style="margin-top:0.5rem">Please visit on a desktop browser<br>for the full gallery experience.</p>
-    <p style="margin-top:1rem"><a href="mailto:chokshibhakti13@gmail.com">chokshibhakti13@gmail.com</a></p>
+    <p style="margin-top:0.5rem">Visit on a desktop browser<br>for the full gallery experience.</p>
+    <a href="mailto:chokshi.asha@gmail.com">chokshi.asha@gmail.com</a>
   </div>
 
   <script type="importmap">
@@ -296,15 +283,15 @@
 
   <script type="module">
   import * as THREE from 'three';
-  import { PointerLockControls } from 'three/addons/controls/PointerLockControls.js';
 
   // ── Scene ────────────────────────────────────────────────────────────────────
   const scene = new THREE.Scene();
-  scene.background = new THREE.Color(0xFFF6EC);
-  scene.fog = new THREE.FogExp2(0xFFF6EC, 0.028);
+  scene.background = new THREE.Color(0xFFF8F2);
+  scene.fog = new THREE.FogExp2(0xFFF8F2, 0.026);
 
   const camera = new THREE.PerspectiveCamera(68, innerWidth / innerHeight, 0.1, 60);
-  camera.position.set(0, 1.7, 8);
+  camera.position.set(0, 1.7, 7);
+  camera.rotation.order = 'YXZ';
 
   const renderer = new THREE.WebGLRenderer({ antialias: true });
   renderer.setPixelRatio(Math.min(devicePixelRatio, 2));
@@ -312,7 +299,7 @@
   renderer.shadowMap.enabled = true;
   renderer.shadowMap.type = THREE.PCFSoftShadowMap;
   renderer.toneMapping = THREE.ACESFilmicToneMapping;
-  renderer.toneMappingExposure = 1.2;
+  renderer.toneMappingExposure = 1.15;
   document.body.appendChild(renderer.domElement);
 
   window.addEventListener('resize', () => {
@@ -324,12 +311,13 @@
   // ── Room ─────────────────────────────────────────────────────────────────────
   const W = 20, D = 22, H = 5;
 
-  const mWall  = new THREE.MeshStandardMaterial({ color: 0xF4EEE3, roughness: 0.96 });
+  // Pale white walls — not stark, not cream
+  const mWall  = new THREE.MeshStandardMaterial({ color: 0xF2F0ED, roughness: 0.97 });
   const mFloor = new THREE.MeshStandardMaterial({ color: 0x7A5C3E, roughness: 0.82 });
-  const mCeil  = new THREE.MeshStandardMaterial({ color: 0xECE6D8, roughness: 1.0 });
-  const mBase  = new THREE.MeshStandardMaterial({ color: 0xC6B49A, roughness: 0.9 });
+  const mCeil  = new THREE.MeshStandardMaterial({ color: 0xEDEBE6, roughness: 1.0  });
+  const mBase  = new THREE.MeshStandardMaterial({ color: 0xC8BEB0, roughness: 0.9  });
 
-  const plane = (w, h, mat, x, y, z, rx, ry) => {
+  const addPlane = (w, h, mat, x, y, z, rx, ry) => {
     const m = new THREE.Mesh(new THREE.PlaneGeometry(w, h), mat);
     m.position.set(x, y, z);
     if (rx) m.rotation.x = rx;
@@ -337,31 +325,27 @@
     m.receiveShadow = true;
     scene.add(m);
   };
-
-  plane(W, D, mFloor, 0,   0,   0,   -Math.PI/2);
-  plane(W, D, mCeil,  0,   H,   0,    Math.PI/2);
-  plane(W, H, mWall,  0,   H/2, -D/2);
-  plane(W, H, mWall,  0,   H/2,  D/2, 0, Math.PI);
-  plane(D, H, mWall,  W/2, H/2,  0,   0, -Math.PI/2);
-  plane(D, H, mWall, -W/2, H/2,  0,   0,  Math.PI/2);
+  addPlane(W, D, mFloor, 0,   0,   0,    -Math.PI/2);
+  addPlane(W, D, mCeil,  0,   H,   0,     Math.PI/2);
+  addPlane(W, H, mWall,  0,   H/2, -D/2);                     // north (front)
+  addPlane(W, H, mWall,  0,   H/2,  D/2,  0, Math.PI);        // south (back/entry)
+  addPlane(D, H, mWall,  W/2, H/2,  0,    0, -Math.PI/2);     // east  (right)
+  addPlane(D, H, mWall, -W/2, H/2,  0,    0,  Math.PI/2);     // west  (left)
 
   // Baseboards
-  const addBase = (sx, sz, x, z, ry) => {
-    const b = new THREE.Mesh(new THREE.BoxGeometry(sx, 0.14, sz), mBase);
-    b.position.set(x, 0.07, z);
-    if (ry) b.rotation.y = ry;
+  const bMesh = (sx, sz, x, z) => {
+    const b = new THREE.Mesh(new THREE.BoxGeometry(sx, 0.13, sz), mBase);
+    b.position.set(x, 0.065, z);
     scene.add(b);
   };
-  addBase(W, 0.06, 0,      -D/2+0.03);
-  addBase(W, 0.06, 0,       D/2-0.03);
-  addBase(0.06, D, W/2-0.03, 0);
-  addBase(0.06, D,-W/2+0.03, 0);
+  bMesh(W, 0.06, 0, -D/2 + 0.03);
+  bMesh(W, 0.06, 0,  D/2 - 0.03);
+  bMesh(0.06, D,  W/2 - 0.03, 0);
+  bMesh(0.06, D, -W/2 + 0.03, 0);
 
-  // ── Ceiling track lights (geometry) ──────────────────────────────────────────
+  // Ceiling track lights
   const mTrack = new THREE.MeshStandardMaterial({
-    color: 0xDDD0C0,
-    emissive: 0xFFE4A0,
-    emissiveIntensity: 0.35,
+    color: 0xCEC5B8, emissive: 0xFFE4A8, emissiveIntensity: 0.3
   });
   [-5, 0, 5].forEach(x => {
     const t = new THREE.Mesh(new THREE.BoxGeometry(0.07, 0.04, D - 2), mTrack);
@@ -370,40 +354,38 @@
   });
 
   // ── Painting factory ──────────────────────────────────────────────────────────
-  const FRAME_COLORS = [0x2C1810, 0x3D2B1A, 0xC9A84C, 0x1C1C1C, 0x4A3728];
+  const FRAMES = [0x2C1810, 0x3D2B1A, 0xC9A84C, 0x1C1C1C, 0x4A3728];
 
   function makePainting(w, h, color, fi = 0) {
     const g = new THREE.Group();
-
-    // Frame
-    const fMat = new THREE.MeshStandardMaterial({ color: FRAME_COLORS[fi % 5], roughness: 0.7 });
-    const frame = new THREE.Mesh(new THREE.BoxGeometry(w + 0.10, h + 0.10, 0.055), fMat);
+    const fm = new THREE.MeshStandardMaterial({ color: FRAMES[fi % 5], roughness: 0.7 });
+    const frame = new THREE.Mesh(new THREE.BoxGeometry(w + 0.09, h + 0.09, 0.05), fm);
     frame.castShadow = true;
     g.add(frame);
-
-    // Canvas face
-    const cMat = new THREE.MeshStandardMaterial({ color, roughness: 0.9 });
-    const cv = new THREE.Mesh(new THREE.BoxGeometry(w, h, 0.05), cMat);
-    cv.position.z = 0.015;
+    const cm = new THREE.MeshStandardMaterial({ color, roughness: 0.88 });
+    const cv  = new THREE.Mesh(new THREE.BoxGeometry(w, h, 0.045), cm);
+    cv.position.z = 0.013;
     g.add(cv);
-
-    // Label card below
-    const lMat = new THREE.MeshStandardMaterial({ color: 0xF4EEE3, roughness: 1 });
-    const lbl = new THREE.Mesh(new THREE.BoxGeometry(0.32, 0.09, 0.01), lMat);
-    lbl.position.set(0, -(h / 2 + 0.13), 0.03);
+    // label card
+    const lm = new THREE.MeshStandardMaterial({ color: 0xF2F0ED, roughness: 1 });
+    const lbl = new THREE.Mesh(new THREE.BoxGeometry(0.30, 0.08, 0.008), lm);
+    lbl.position.set(0, -(h/2 + 0.115), 0.028);
     g.add(lbl);
-
     return g;
   }
 
-  function hang(x, y, z, ry, w, h, col, fi) {
-    const p = makePainting(w, h, col, fi);
-    p.position.set(x, y, z);
-    p.rotation.y = ry;
-    scene.add(p);
+  // All clickable painting groups
+  const paintings = [];
+
+  function hang(x, y, z, ry, w, h, col, fi, meta) {
+    const g = makePainting(w, h, col, fi);
+    g.position.set(x, y, z);
+    g.rotation.y = ry;
+    if (meta) { g.userData.meta = meta; paintings.push(g); }
+    scene.add(g);
   }
 
-  function lean(x, z, ry, w, h, col, fi) {
+  function lean(x, z, ry, w, h, col, fi, meta) {
     const g = new THREE.Group();
     const p = makePainting(w, h, col, fi);
     p.position.y = h / 2;
@@ -411,160 +393,449 @@
     g.position.set(x, 0, z);
     g.rotation.order = 'YXZ';
     g.rotation.y = ry;
-    g.rotation.x = 0.21; // lean ~12° from vertical into wall
+    // north wall (ry≈0): +angle leans top toward -Z (toward north wall)
+    // all other walls:   -angle leans top toward their respective wall
+    g.rotation.x = Math.abs(ry) < 0.01 ? 0.20 : -0.20;
+    if (meta) { g.userData.meta = meta; paintings.push(g); }
     scene.add(g);
   }
 
-  // ── Gallery layout ─────────────────────────────────────────────────────────
-  // Walls:  North z=-11  South z=+11  East x=+10  West x=-10
+  // ── Gallery data ──────────────────────────────────────────────────────────────
+
+  // Wall normals (where to offset painting from wall surface)
   const NZ = -D/2 + 0.06, SZ = D/2 - 0.06;
   const EX =  W/2 - 0.06, WX = -W/2 + 0.06;
 
-  // — North wall (5 hung, 4 leaning) —
-  hang(-7,   2.5,  NZ, 0, 1.0, 1.4, 0xC4783C, 0);
-  hang(-3.5, 2.25, NZ, 0, 1.6, 1.0, 0x4A6741, 2);
-  hang( 0,   2.6,  NZ, 0, 0.9, 1.3, 0x8B3A3A, 0);
-  hang( 3.5, 2.2,  NZ, 0, 1.5, 0.9, 0x2C5F8A, 1);
-  hang( 7,   2.45, NZ, 0, 1.1, 1.5, 0xDAA520, 3);
+  // ────────────────────────────────────────────────────────────────
+  // WEST WALL (left when entering) — 1990s Sketches
+  // Small clustered works, some larger pieces between clusters
+  // ────────────────────────────────────────────────────────────────
+  const SK = (i) => ({
+    title: `Sketch No. ${i} — 1990s`,
+    year: `199${Math.floor(Math.random()*9)}`,
+    medium: 'Graphite / charcoal on paper',
+    size: '8 × 10 in',
+    note: 'From a personal sketchbook series. These quick studies capture observation and feeling rather than form.'
+  });
 
-  lean(-5.8, -D/2 + 0.38, 0, 1.0, 0.8, 0x5C4033, 0);
-  lean(-4.5, -D/2 + 0.28, 0, 0.75,1.2, 0x3A5F4E, 1);
-  lean( 5.0, -D/2 + 0.38, 0, 1.2, 0.9, 0x8B6914, 4);
-  lean( 6.2, -D/2 + 0.28, 0, 0.8, 1.1, 0x7B3F00, 0);
+  // Cluster A — z = -9 to -7
+  hang(WX, 2.55, -9.0,  Math.PI/2, 0.42, 0.52, 0xD2C8B8, 0, SK(1));
+  hang(WX, 2.20, -8.1,  Math.PI/2, 0.38, 0.48, 0xC8BCA8, 1, SK(2));
+  hang(WX, 2.70, -7.2,  Math.PI/2, 0.46, 0.38, 0xD6CCBC, 0, SK(3));
 
-  // — South wall (4 hung, 3 leaning) —
-  hang(-6,   2.4,  SZ, Math.PI, 1.2, 0.9, 0xB5651D, 0);
-  hang(-2,   2.6,  SZ, Math.PI, 0.85,1.3, 0x556B2F, 2);
-  hang( 2,   2.3,  SZ, Math.PI, 1.5, 1.0, 0xA0522D, 1);
-  hang( 6,   2.5,  SZ, Math.PI, 0.9, 1.2, 0x2F4F4F, 3);
+  // A break — one larger piece
+  hang(WX, 2.40, -5.5,  Math.PI/2, 0.85, 1.10, 0xB8A890, 2, {
+    title: 'Still Life — Window Light',
+    year: '1994',
+    medium: 'Pencil on cartridge paper',
+    size: '14 × 18 in',
+    note: 'A larger study of light coming through a kitchen window. Drawn over three sittings.'
+  });
 
-  lean( 3.5,  D/2 - 0.38, Math.PI, 1.1, 0.85, 0x7F4E1E, 0);
-  lean( 4.8,  D/2 - 0.28, Math.PI, 0.75,1.1,  0x2B4C7E, 1);
-  lean(-5.0,  D/2 - 0.38, Math.PI, 1.3, 0.9,  0x6B3A2A, 0);
+  // Cluster B — z = -3.5 to -2
+  hang(WX, 2.60, -3.5,  Math.PI/2, 0.40, 0.50, 0xCFC4B2, 0, SK(4));
+  hang(WX, 2.25, -2.6,  Math.PI/2, 0.44, 0.44, 0xC4B8A4, 1, SK(5));
 
-  // — East wall (3 hung, 2 leaning) —
-  hang(EX, 2.5, -5.5, -Math.PI/2, 1.0, 1.45, 0xC49A3C, 2);
-  hang(EX, 2.3,  0.5, -Math.PI/2, 1.5, 0.9,  0x8B0000, 0);
-  hang(EX, 2.45, 6,   -Math.PI/2, 0.9, 1.2,  0x4682B4, 1);
+  // Another larger piece
+  hang(WX, 2.45, -0.8,  Math.PI/2, 0.90, 0.68, 0xBFB09C, 2, {
+    title: 'Portrait Study',
+    year: '1996',
+    medium: 'Charcoal on paper',
+    size: '12 × 16 in',
+    note: 'A face study done at life drawing class. The subject sat for about 40 minutes.'
+  });
 
-  lean(W/2 - 0.38, -3.0, -Math.PI/2, 1.0, 0.8,  0xC49A3C, 0);
-  lean(W/2 - 0.28,  4.5, -Math.PI/2, 0.8, 1.15, 0x6B3A2A, 3);
+  // Cluster C — z = 2 to 4.5
+  hang(WX, 2.65, 2.0,   Math.PI/2, 0.38, 0.50, 0xCEC2AE, 0, SK(6));
+  hang(WX, 2.30, 2.9,   Math.PI/2, 0.44, 0.40, 0xC6BAA6, 1, SK(7));
+  hang(WX, 2.60, 4.0,   Math.PI/2, 0.40, 0.48, 0xD0C6B4, 0, SK(8));
 
-  // — West wall (3 hung, 2 leaning) —
-  hang(WX, 2.4, -5,   Math.PI/2, 1.3, 1.0,  0xCD853F, 1);
-  hang(WX, 2.6,  1,   Math.PI/2, 0.8, 1.15, 0x6B8E23, 0);
-  hang(WX, 2.3,  6.5, Math.PI/2, 1.4, 0.8,  0x8B4513, 2);
+  // A couple of leaning floor pieces against west wall
+  lean(-W/2 + 0.35, -6.5, Math.PI/2, 0.80, 1.10, 0xBAAA94, 0, {
+    title: 'Reclining Figure — Study',
+    year: '1993',
+    medium: 'Graphite on cartridge paper',
+    size: '18 × 24 in',
+    note: 'A larger floor study. Leans here just as it has always leaned in the studio.'
+  });
+  lean(-W/2 + 0.28, 5.5,  Math.PI/2, 1.10, 0.85, 0xC2B4A0, 1, {
+    title: 'Landscape Sketch',
+    year: '1998',
+    medium: 'Pencil on paper',
+    size: '20 × 14 in',
+    note: 'A quick outdoor sketch, probably done on a hill somewhere. Done in under an hour.'
+  });
 
-  lean(-W/2 + 0.38,  3.0, Math.PI/2, 1.0, 1.3,  0x4A7C59, 0);
-  lean(-W/2 + 0.28, -4.5, Math.PI/2, 1.2, 0.85, 0xDAA520, 4);
+  // ────────────────────────────────────────────────────────────────
+  // NORTH WALL (facing you when you enter) — 6 Masterpieces
+  // Big canvases, grouped in pairs
+  // ────────────────────────────────────────────────────────────────
+  const MASTER = [
+    {
+      title: 'Monsoon Evening',
+      year: '2008',
+      medium: 'Oil on canvas',
+      size: '36 × 48 in',
+      note: 'The first large canvas after years of smaller work. Painted over six weeks during the monsoon. The blues kept changing.'
+    },
+    {
+      title: 'Village at Dusk',
+      year: '2011',
+      medium: 'Oil on canvas',
+      size: '30 × 40 in',
+      note: 'Inspired by a memory of a village at the edge of Rajasthan. The light was unlike anything seen in a city.'
+    },
+    {
+      title: 'Still Life with Marigolds',
+      year: '2015',
+      medium: 'Oil on linen',
+      size: '24 × 30 in',
+      note: 'Part of a series exploring warm and cool colour against each other. The orange and the shadow took months to get right.'
+    },
+    {
+      title: 'Untitled (Red)',
+      year: '2017',
+      medium: 'Acrylic on canvas',
+      size: '40 × 50 in',
+      note: 'A departure. No reference, no plan. Started in red and stayed there. One of the few purely intuitive pieces.'
+    },
+    {
+      title: 'The Garden Wall',
+      year: '2019',
+      medium: 'Oil on canvas',
+      size: '30 × 36 in',
+      note: 'Painted from a corner of the garden during lockdown. The cracks in the plaster are accurate — this is observation, not imagination.'
+    },
+    {
+      title: 'Blue Morning',
+      year: '2022',
+      medium: 'Oil on canvas',
+      size: '36 × 48 in',
+      note: 'The most recent large work. Painted in winter. Very cold mornings. The blue came naturally.'
+    },
+  ];
 
-  // ── Bench ─────────────────────────────────────────────────────────────────────
+  // Pair 1 — west side
+  hang(-7.0, 2.65, NZ, 0, 1.60, 1.20, 0x8B3A3A, 0, MASTER[0]);
+  hang(-4.8, 2.40, NZ, 0, 1.40, 1.50, 0x1A3A6B, 1, MASTER[1]);
+
+  // Pair 2 — centre
+  hang(-1.5, 2.70, NZ, 0, 1.55, 1.35, 0x2D5A1B, 0, MASTER[2]);
+  hang( 1.5, 2.50, NZ, 0, 1.70, 1.10, 0x8B1A1A, 2, MASTER[3]);
+
+  // Pair 3 — east side
+  hang( 4.6, 2.60, NZ, 0, 1.45, 1.30, 0x4B2E83, 1, MASTER[4]);
+  hang( 6.8, 2.45, NZ, 0, 1.35, 1.50, 0xB5651D, 0, MASTER[5]);
+
+  // Two large leaning pieces at north wall base
+  lean(-6.0, -D/2 + 0.40, 0, 1.30, 1.80, 0x6B3A2A, 0, {
+    title: 'Large Canvas — Unfinished',
+    year: '2020',
+    medium: 'Oil on canvas',
+    size: '48 × 60 in',
+    note: 'Never quite finished. Left to stand here. There\'s something in the incompleteness that feels honest.'
+  });
+  lean( 5.5, -D/2 + 0.32, 0, 1.20, 1.60, 0x2F4F4F, 1, {
+    title: 'Seascape Study',
+    year: '2016',
+    medium: 'Oil on board',
+    size: '40 × 54 in',
+    note: 'A large preparatory study. The final painting is in a private collection. This one stayed.'
+  });
+
+  // ────────────────────────────────────────────────────────────────
+  // EAST WALL (right when entering) — Valley of Flowers Series
+  // 20+ small pieces, flower studies in a grid
+  // ────────────────────────────────────────────────────────────────
+  const FLOWER_COLORS = [
+    0xFF7F7F, 0xFF9060, 0xFFB347, 0xFF6EB4, 0xFF4E8A,
+    0xFF7EAC, 0xFF8B8B, 0xE85050, 0xFFA090, 0xFFCC7A,
+    0xFF6060, 0xFFA500, 0xFF80AF, 0xFF5070, 0xFF9E7A,
+    0xFF6485, 0xFF7CB0, 0xFFB555, 0xFF5555, 0xF4728C,
+    0xFF8C6A, 0xFFD180, 0xFF7F9E, 0xFF5C8A,
+  ];
+
+  // 4 columns (along z) × 6 rows (y) = 24 pieces
+  // z positions: -7, -5.2, -3.4, -1.6 (4 cols, 1.8 apart)
+  // y positions: 1.5, 2.0, 2.5, 3.0, 3.5, 4.0 (6 rows, 0.5 apart)
+  let fi = 0;
+  for (let row = 0; row < 6; row++) {
+    for (let col = 0; col < 4; col++) {
+      const z = -7.0 + col * 1.8;
+      const y =  1.5 + row * 0.5;
+      hang(EX, y, z, -Math.PI/2, 0.36, 0.38, FLOWER_COLORS[fi % FLOWER_COLORS.length], 3, {
+        title: `Valley of Flowers — No. ${fi + 1}`,
+        year: '—',
+        medium: 'Watercolour on paper',
+        size: '4 × 4 in',
+        note: 'One of 20+ studies of wildflowers. Painted en plein air during a trip to Himachal Pradesh.'
+      });
+      fi++;
+    }
+  }
+
+  // A few leaning flower pieces
+  lean(W/2 - 0.35, -8.5, -Math.PI/2, 0.55, 0.70, 0xFF9060, 3, {
+    title: 'Valley of Flowers — Oversize Study',
+    year: '—',
+    medium: 'Watercolour on paper',
+    size: '12 × 16 in',
+    note: 'A larger version made to understand scale. The flowers are bigger here than they feel in real life.'
+  });
+  lean(W/2 - 0.28,  0.5, -Math.PI/2, 0.65, 0.55, 0xFFB347, 2, {
+    title: 'Valley of Flowers — Marigold Study',
+    year: '—',
+    medium: 'Watercolour on paper',
+    size: '10 × 14 in',
+    note: 'Marigolds specifically. The orange was very difficult to get right in watercolour.'
+  });
+
+  // ────────────────────────────────────────────────────────────────
+  // SOUTH WALL (behind you, visible as you turn) — Collector's Items
+  // Works collected over years — not all her IP
+  // ────────────────────────────────────────────────────────────────
+  const COLLECT = [
+    {
+      title: 'Evening Raga',
+      year: '1981',
+      medium: 'Oil on canvas',
+      size: '20 × 24 in',
+      note: 'Acquired from a fellow artist at an exhibition in Ahmedabad. The layering of colour is something that has always been instructive.'
+    },
+    {
+      title: 'Mud Houses, Kutch',
+      year: '1977',
+      medium: 'Watercolour',
+      size: '14 × 18 in',
+      note: 'Purchased at a local art fair in the early 1980s. The simplicity of the forms is striking.'
+    },
+    {
+      title: 'Temple Steps',
+      year: '1990',
+      medium: 'Oil on board',
+      size: '12 × 16 in',
+      note: 'A gift from a friend who was a landscape painter. The way shadow is handled here is worth studying.'
+    },
+    {
+      title: 'Untitled Still Life',
+      year: '1988',
+      medium: 'Oil on canvas',
+      size: '18 × 22 in',
+      note: 'Found at an auction. The artist is unknown. The quality of observation is very high.'
+    },
+    {
+      title: 'Figure in Blue',
+      year: '1995',
+      medium: 'Acrylic on canvas',
+      size: '24 × 30 in',
+      note: 'Collected from a group show. The blue is unusual — almost electric for oil-trained eyes.'
+    },
+    {
+      title: 'Monsoon Study (Not Mine)',
+      year: '1983',
+      medium: 'Watercolour',
+      size: '10 × 14 in',
+      note: 'A watercolour by another artist, bought because the handling of wet-in-wet is almost perfect.'
+    },
+  ];
+
+  hang(-6.5, 2.40, SZ, Math.PI, 1.20, 0.90, 0xC4893C, 2, COLLECT[0]);
+  hang(-3.5, 2.60, SZ, Math.PI, 0.85, 1.20, 0x5C6D2E, 0, COLLECT[1]);
+  hang(-0.5, 2.35, SZ, Math.PI, 1.40, 0.85, 0x6B4226, 1, COLLECT[2]);
+  hang( 2.5, 2.55, SZ, Math.PI, 0.90, 1.15, 0x2C4770, 3, COLLECT[3]);
+  hang( 5.0, 2.40, SZ, Math.PI, 1.10, 0.95, 0x8B3A3A, 0, COLLECT[4]);
+  hang( 7.0, 2.65, SZ, Math.PI, 0.80, 1.10, 0x3D3D70, 1, COLLECT[5]);
+
+  lean( 4.0,  D/2 - 0.38, Math.PI, 1.10, 0.80, 0x7F4E1E, 0, {
+    title: 'Collected Large Work',
+    year: '—',
+    medium: '—',
+    size: '—',
+    note: 'A piece collected over the years. Leans here, always has.'
+  });
+  lean(-5.0,  D/2 - 0.30, Math.PI, 0.80, 1.20, 0x2B4C7E, 1, {
+    title: 'Collected Landscape',
+    year: '—',
+    medium: 'Oil on board',
+    size: '—',
+    note: 'Part of a small collection of landscapes. The perspective is unusual and worth looking at closely.'
+  });
+
+  // ── Bench ────────────────────────────────────────────────────────────────────
   const mBench = new THREE.MeshStandardMaterial({ color: 0x3D2B1A, roughness: 0.8 });
-  const bench = new THREE.Mesh(new THREE.BoxGeometry(2.4, 0.08, 0.55), mBench);
+  const bench  = new THREE.Mesh(new THREE.BoxGeometry(2.4, 0.08, 0.55), mBench);
   bench.position.set(0, 0.44, 0);
   bench.castShadow = true;
   scene.add(bench);
   [-1.1, 1.1].forEach(lx => {
-    const leg = new THREE.Mesh(new THREE.BoxGeometry(0.07, 0.44, 0.5), mBench);
+    const leg = new THREE.Mesh(new THREE.BoxGeometry(0.07, 0.44, 0.50), mBench);
     leg.position.set(lx, 0.22, 0);
     scene.add(leg);
   });
 
-  // ── Lighting ──────────────────────────────────────────────────────────────────
-  scene.add(new THREE.AmbientLight(0xFFF4E0, 0.5));
+  // ── Lighting ─────────────────────────────────────────────────────────────────
+  scene.add(new THREE.AmbientLight(0xFFF4E0, 0.48));
 
-  // Ceiling fill
-  const fills = [[0,H-0.1,0],[-5,H-0.1,-5],[5,H-0.1,-5],[-5,H-0.1,5],[5,H-0.1,5]];
-  fills.forEach(([x,y,z]) => {
-    const l = new THREE.PointLight(0xFFE4C0, 0.45, 20);
+  // Ceiling fills
+  [[0,H-0.1,0],[-5,H-0.1,-5],[5,H-0.1,-5],[-5,H-0.1,5],[5,H-0.1,5]].forEach(([x,y,z]) => {
+    const l = new THREE.PointLight(0xFFE4C0, 0.42, 22);
     l.position.set(x, y, z);
     scene.add(l);
   });
 
-  // Wall spots — warm accent lights above each painting cluster
+  // Wall spots
   [
-    // North
-    [-7,H-0.4,-D/2+2], [-3.5,H-0.4,-D/2+2], [0,H-0.4,-D/2+2], [3.5,H-0.4,-D/2+2], [7,H-0.4,-D/2+2],
-    // South
-    [-6,H-0.4,D/2-2], [-2,H-0.4,D/2-2], [2,H-0.4,D/2-2], [6,H-0.4,D/2-2],
-    // East
-    [W/2-2,H-0.4,-5.5], [W/2-2,H-0.4,0.5], [W/2-2,H-0.4,6],
-    // West
-    [-W/2+2,H-0.4,-5], [-W/2+2,H-0.4,1], [-W/2+2,H-0.4,6.5],
+    // North masterpieces
+    [-7,H-0.4,-D/2+2],[-4.8,H-0.4,-D/2+2],[-1.5,H-0.4,-D/2+2],
+    [1.5,H-0.4,-D/2+2],[4.6,H-0.4,-D/2+2],[6.8,H-0.4,-D/2+2],
+    // West sketches
+    [-W/2+2,H-0.4,-9],[-W/2+2,H-0.4,-5.5],[-W/2+2,H-0.4,-0.8],[-W/2+2,H-0.4,3],
+    // East flowers
+    [W/2-2,H-0.4,-7],[W/2-2,H-0.4,-3.5],[W/2-2,H-0.4,0],
+    // South collector
+    [-6.5,H-0.4,D/2-2],[-3.5,H-0.4,D/2-2],[0,H-0.4,D/2-2],[4,H-0.4,D/2-2],[7,H-0.4,D/2-2],
   ].forEach(([x,y,z]) => {
-    const l = new THREE.PointLight(0xFFCC70, 0.8, 7);
+    const l = new THREE.PointLight(0xFFD080, 0.72, 7);
     l.position.set(x, y, z);
     scene.add(l);
   });
 
-  // ── Controls ──────────────────────────────────────────────────────────────────
-  const controls = new PointerLockControls(camera, document.body);
+  // ── Navigation: click-to-move + drag-to-look ─────────────────────────────────
+  let yaw = 0, pitch = 0;
+  let isDragging = false, mouseDownX = 0, mouseDownY = 0, lastMX = 0, lastMY = 0;
 
-  const keys = {};
-  document.addEventListener('keydown', e => { keys[e.code] = true; });
-  document.addEventListener('keyup',   e => { keys[e.code] = false; });
+  // Smooth move tween
+  let moveStart = null, moveTarget = null, moveTween = 1;
+  const MOVE_SPEED = 0.9; // seconds
 
-  const SPEED  = 5;
-  const moveDir = new THREE.Vector3();
-  let prevT = performance.now();
+  const raycaster  = new THREE.Raycaster();
+  const mousePt    = new THREE.Vector2();
+  let   floorMesh  = null;
 
-  function updateMovement() {
-    const now = performance.now();
-    const dt  = Math.min((now - prevT) / 1000, 0.05);
-    prevT = now;
-    if (!controls.isLocked) return;
+  // Keep ref to floor for raycasting
+  (() => {
+    floorMesh = new THREE.Mesh(
+      new THREE.PlaneGeometry(W, D),
+      new THREE.MeshBasicMaterial({ visible: false, side: THREE.DoubleSide })
+    );
+    floorMesh.rotation.x = -Math.PI / 2;
+    floorMesh.position.y = 0.01;
+    scene.add(floorMesh);
+  })();
 
-    moveDir.set(0, 0, 0);
-    if (keys['KeyW'] || keys['ArrowUp'])    moveDir.z -= 1;
-    if (keys['KeyS'] || keys['ArrowDown'])  moveDir.z += 1;
-    if (keys['KeyA'] || keys['ArrowLeft'])  moveDir.x -= 1;
-    if (keys['KeyD'] || keys['ArrowRight']) moveDir.x += 1;
-    if (moveDir.lengthSq() > 0) moveDir.normalize();
+  const canvas = renderer.domElement;
 
-    controls.moveForward(-moveDir.z * SPEED * dt);
-    controls.moveRight(   moveDir.x * SPEED * dt);
+  canvas.addEventListener('mousedown', e => {
+    isDragging = false;
+    mouseDownX = lastMX = e.clientX;
+    mouseDownY = lastMY = e.clientY;
+  });
 
-    const M = 0.55;
-    camera.position.x = Math.max(-W/2 + M, Math.min(W/2 - M, camera.position.x));
-    camera.position.z = Math.max(-D/2 + M, Math.min(D/2 - M, camera.position.z));
-    camera.position.y = 1.7;
+  canvas.addEventListener('mousemove', e => {
+    mousePt.x = (e.clientX / innerWidth)  *  2 - 1;
+    mousePt.y = (e.clientY / innerHeight) * -2 + 1;
+
+    if (e.buttons === 1) {
+      const dx = e.clientX - lastMX;
+      const dy = e.clientY - lastMY;
+      if (Math.abs(e.clientX - mouseDownX) > 3 || Math.abs(e.clientY - mouseDownY) > 3) {
+        isDragging = true;
+      }
+      if (isDragging) {
+        yaw   -= dx * 0.0025;
+        pitch  = Math.max(-1.05, Math.min(1.05, pitch - dy * 0.0025));
+        camera.rotation.y = yaw;
+        camera.rotation.x = pitch;
+      }
+      lastMX = e.clientX;
+      lastMY = e.clientY;
+    }
+
+    // Hover cursor
+    raycaster.setFromCamera(mousePt, camera);
+    const pHits = raycaster.intersectObjects(paintings, true);
+    canvas.style.cursor = pHits.length > 0 ? 'pointer' : (e.buttons === 1 ? 'grabbing' : 'default');
+  });
+
+  canvas.addEventListener('click', e => {
+    if (isDragging) { isDragging = false; return; }
+
+    const ndcX = (e.clientX / innerWidth)  *  2 - 1;
+    const ndcY = (e.clientY / innerHeight) * -2 + 1;
+    raycaster.setFromCamera(new THREE.Vector2(ndcX, ndcY), camera);
+
+    // 1. Check paintings
+    const pHits = raycaster.intersectObjects(paintings, true);
+    if (pHits.length > 0) {
+      let obj = pHits[0].object;
+      while (obj) {
+        if (obj.userData && obj.userData.meta) { showInfo(obj.userData.meta); return; }
+        obj = obj.parent;
+      }
+    }
+
+    // 2. Click on floor → move there
+    const fHits = raycaster.intersectObject(floorMesh);
+    if (fHits.length > 0) {
+      const pt = fHits[0].point;
+      const M  = 0.65;
+      const tx = Math.max(-W/2 + M, Math.min(W/2 - M, pt.x));
+      const tz = Math.max(-D/2 + M, Math.min(D/2 - M, pt.z));
+      moveStart  = camera.position.clone();
+      moveTarget = new THREE.Vector3(tx, 1.7, tz);
+      moveTween  = 0;
+    }
+  });
+
+  // ── Info panel ────────────────────────────────────────────────────────────────
+  const panel     = document.getElementById('info-panel');
+  const closeBtn  = document.getElementById('info-close');
+
+  function showInfo(meta) {
+    document.getElementById('info-title').textContent  = meta.title  ?? '—';
+    document.getElementById('info-year').textContent   = meta.year   ?? '—';
+    document.getElementById('info-medium').textContent = meta.medium ?? '—';
+    document.getElementById('info-size').textContent   = meta.size   ?? '—';
+    document.getElementById('info-note').textContent   = meta.note   ?? '';
+    panel.classList.add('visible');
   }
 
-  // ── Pointer lock events ───────────────────────────────────────────────────────
-  const lockOverlay  = document.getElementById('lock-overlay');
-  const crosshair    = document.getElementById('crosshair');
-  const hint         = document.getElementById('controls-hint');
-
-  controls.addEventListener('lock', () => {
-    lockOverlay.style.display = 'none';
-    crosshair.style.display   = 'block';
-    hint.style.display        = 'block';
+  closeBtn.addEventListener('click', () => panel.classList.remove('visible'));
+  document.addEventListener('keydown', e => {
+    if (e.key === 'Escape') panel.classList.remove('visible');
   });
-  controls.addEventListener('unlock', () => {
-    lockOverlay.style.display = 'flex';
-    crosshair.style.display   = 'none';
-  });
-  lockOverlay.addEventListener('click', () => controls.lock());
 
   // ── Door entry ────────────────────────────────────────────────────────────────
   document.getElementById('enter-btn').addEventListener('click', () => {
     document.getElementById('door-left').classList.add('open');
     document.getElementById('door-right').classList.add('open');
-
     const landing = document.getElementById('landing');
     setTimeout(() => {
       landing.classList.add('fade-out');
       setTimeout(() => {
         landing.style.display = 'none';
-        lockOverlay.style.display = 'flex';
+        document.getElementById('hint').style.display = 'block';
       }, 800);
     }, 950);
   });
 
   // ── Render loop ───────────────────────────────────────────────────────────────
+  let prevT = performance.now();
+
   function animate() {
     requestAnimationFrame(animate);
-    updateMovement();
+
+    const now = performance.now();
+    const dt  = Math.min((now - prevT) / 1000, 0.05);
+    prevT = now;
+
+    // Smooth move tween
+    if (moveTarget && moveTween < 1) {
+      moveTween = Math.min(1, moveTween + dt / MOVE_SPEED);
+      const t = 1 - Math.pow(1 - moveTween, 3); // ease-out cubic
+      camera.position.lerpVectors(moveStart, moveTarget, t);
+    }
+
     renderer.render(scene, camera);
   }
   animate();
