@@ -3,169 +3,571 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Asha Chokshi — Artist</title>
+  <title>Artworks by Asha Chokshi</title>
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,600;1,400&family=DM+Sans:wght@300;400&display=swap" rel="stylesheet" />
   <style>
-    *, *::before, *::after {
-      box-sizing: border-box;
-      margin: 0;
-      padding: 0;
-    }
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
     body {
-      min-height: 100vh;
-      background-color: #F8F0E3;
-      color: #3D2B1F;
+      background: #1a0f0a;
+      overflow: hidden;
       font-family: 'DM Sans', sans-serif;
+    }
+
+    canvas {
+      position: fixed;
+      inset: 0;
+      z-index: 0;
+      display: block;
+    }
+
+    /* ── Landing / Glass Door ─────────────────────────────────────── */
+    #landing {
+      position: fixed;
+      inset: 0;
+      z-index: 20;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: linear-gradient(160deg, rgba(8,4,2,0.4) 0%, rgba(20,10,4,0.55) 100%);
+      transition: opacity 0.8s ease;
+    }
+    #landing.fade-out { opacity: 0; pointer-events: none; }
+
+    #door-surround {
+      position: relative;
+      width: min(400px, 82vw);
+      height: min(580px, 80vh);
+      perspective: 2400px;
+    }
+
+    /* decorative outer frame */
+    #door-surround::before {
+      content: '';
+      position: absolute;
+      inset: -14px;
+      border: 1.5px solid rgba(196,122,69,0.45);
+      pointer-events: none;
+    }
+    #door-surround::after {
+      content: '';
+      position: absolute;
+      inset: -22px;
+      border: 1px solid rgba(196,122,69,0.18);
+      pointer-events: none;
+    }
+
+    #gallery-sign {
+      position: absolute;
+      top: -42px;
+      left: 50%;
+      transform: translateX(-50%);
+      font-size: 0.65rem;
+      letter-spacing: 0.35em;
+      text-transform: uppercase;
+      color: rgba(196,122,69,0.85);
+      white-space: nowrap;
+    }
+
+    .door-panel {
+      position: absolute;
+      top: 0;
+      width: 50%;
+      height: 100%;
+      background: rgba(255,248,235,0.06);
+      backdrop-filter: blur(22px) saturate(0.55) brightness(1.08);
+      -webkit-backdrop-filter: blur(22px) saturate(0.55) brightness(1.08);
+      border: 1px solid rgba(255,245,220,0.18);
+      transition: transform 1.05s cubic-bezier(0.4, 0, 0.2, 1);
+      transform-style: preserve-3d;
+    }
+
+    /* thin vertical dividers on glass panels */
+    .door-panel::before {
+      content: '';
+      position: absolute;
+      top: 10%;
+      bottom: 10%;
+      width: 1px;
+      background: rgba(255,245,220,0.12);
+    }
+
+    #door-left {
+      left: 0;
+      border-right: none;
+      transform-origin: left center;
+    }
+    #door-left::before { right: 33%; }
+
+    #door-right {
+      right: 0;
+      border-left: none;
+      transform-origin: right center;
+    }
+    #door-right::before { left: 33%; }
+
+    #door-left.open  { transform: perspective(2400px) rotateY(-87deg); }
+    #door-right.open { transform: perspective(2400px) rotateY(87deg); }
+
+    .door-handle {
+      position: absolute;
+      top: 50%;
+      width: 5px;
+      height: 36px;
+      background: rgba(196,122,69,0.55);
+      border-radius: 3px;
+      transform: translateY(-50%);
+    }
+    #door-left  .door-handle { right: 12px; }
+    #door-right .door-handle { left: 12px; }
+
+    #door-content {
+      position: absolute;
+      inset: 0;
       display: flex;
       flex-direction: column;
       align-items: center;
       justify-content: center;
-      padding: 2rem 1.5rem;
-    }
-
-    main {
-      max-width: 560px;
-      width: 100%;
+      gap: 0.7rem;
+      padding: 2rem;
+      z-index: 2;
       text-align: center;
     }
 
-    .artist-name {
+    #door-content h1 {
       font-family: 'Playfair Display', serif;
-      font-size: clamp(2.4rem, 8vw, 3.8rem);
+      font-size: clamp(1.5rem, 5.5vw, 2.1rem);
       font-weight: 600;
-      letter-spacing: 0.02em;
-      line-height: 1.15;
-      color: #3D2B1F;
+      color: #F8F0E3;
+      line-height: 1.2;
+      text-shadow: 0 2px 16px rgba(0,0,0,0.6);
+      pointer-events: none;
     }
 
-    .tagline {
-      margin-top: 0.6rem;
-      font-family: 'DM Sans', sans-serif;
-      font-size: 0.85rem;
-      font-weight: 300;
-      letter-spacing: 0.18em;
+    .journey-label {
+      font-size: 0.72rem;
+      letter-spacing: 0.22em;
       text-transform: uppercase;
-      color: #8B6E4E;
+      color: rgba(196,122,69,0.9);
+      pointer-events: none;
     }
 
-    .divider {
-      margin: 2rem auto;
-      width: 60px;
-      height: 2px;
-      background-color: #C47A45;
-      border: none;
+    #enter-btn {
+      margin-top: 1rem;
+      padding: 0.6rem 1.5rem;
+      background: rgba(196,122,69,0.12);
+      border: 1px solid rgba(196,122,69,0.5);
+      color: #F8F0E3;
+      font-family: 'DM Sans', sans-serif;
+      font-size: 0.82rem;
+      letter-spacing: 0.14em;
+      cursor: pointer;
+      transition: background 0.2s, border-color 0.2s;
+    }
+    #enter-btn:hover {
+      background: rgba(196,122,69,0.28);
+      border-color: rgba(196,122,69,0.75);
     }
 
-    .artwork-placeholder {
-      margin: 0 auto 2.2rem;
-      width: 100%;
-      max-width: 400px;
-      aspect-ratio: 4 / 3;
-      background-color: #E8D5B7;
-      border: 1.5px solid #C47A45;
-      display: flex;
+    /* ── Post-entry UI ────────────────────────────────────────────── */
+    #controls-hint {
+      display: none;
+      position: fixed;
+      bottom: 22px;
+      left: 50%;
+      transform: translateX(-50%);
+      z-index: 30;
+      color: rgba(248,240,227,0.7);
+      font-size: 0.73rem;
+      letter-spacing: 0.06em;
+      background: rgba(15,8,3,0.6);
+      padding: 0.45rem 1.1rem;
+      white-space: nowrap;
+      pointer-events: none;
+    }
+
+    #crosshair {
+      display: none;
+      position: fixed;
+      top: 50%; left: 50%;
+      transform: translate(-50%, -50%);
+      z-index: 30;
+      color: rgba(248,240,227,0.55);
+      font-size: 1.4rem;
+      pointer-events: none;
+      line-height: 1;
+    }
+
+    #lock-overlay {
+      display: none;
+      position: fixed;
+      inset: 0;
+      z-index: 25;
+      background: rgba(8,4,2,0.72);
+      backdrop-filter: blur(5px);
+      -webkit-backdrop-filter: blur(5px);
       align-items: center;
       justify-content: center;
-      position: relative;
-      overflow: hidden;
+      flex-direction: column;
+      gap: 0.5rem;
+      cursor: pointer;
+    }
+    #lock-overlay p {
+      color: #F8F0E3;
+      font-size: 1rem;
+      letter-spacing: 0.1em;
+    }
+    #lock-overlay small {
+      color: rgba(196,122,69,0.75);
+      font-size: 0.72rem;
+      letter-spacing: 0.14em;
     }
 
-    .artwork-placeholder::before {
-      content: '';
-      position: absolute;
-      inset: 8px;
-      border: 1px solid rgba(196, 122, 69, 0.25);
+    /* ── Mobile notice ────────────────────────────────────────────── */
+    #mobile-notice {
+      display: none;
+      position: fixed;
+      inset: 0;
+      z-index: 50;
+      background: #1a0f0a;
+      color: #F8F0E3;
+      align-items: center;
+      justify-content: center;
+      flex-direction: column;
+      gap: 1rem;
+      text-align: center;
+      padding: 2rem;
     }
-
-    .artwork-placeholder span {
+    #mobile-notice h2 {
       font-family: 'Playfair Display', serif;
-      font-style: italic;
-      font-size: 0.9rem;
-      color: #8B6E4E;
-      letter-spacing: 0.04em;
+      font-size: 1.5rem;
+      color: #F8F0E3;
     }
+    #mobile-notice p { font-size: 0.85rem; color: #8B6E4E; line-height: 1.6; }
+    #mobile-notice a { color: #C47A45; text-decoration: none; }
 
-    .coming-soon {
-      font-family: 'Playfair Display', serif;
-      font-size: clamp(1.5rem, 5vw, 2rem);
-      font-weight: 400;
-      letter-spacing: 0.06em;
-      color: #3D2B1F;
-    }
-
-    .blurb {
-      margin-top: 0.75rem;
-      font-size: 0.9rem;
-      font-weight: 300;
-      color: #8B6E4E;
-      line-height: 1.6;
-      letter-spacing: 0.02em;
-    }
-
-    .managed-by {
-      margin-top: 1.8rem;
-      font-size: 0.82rem;
-      font-weight: 300;
-      color: #8B6E4E;
-      letter-spacing: 0.04em;
-    }
-
-    .contact {
-      margin-top: 0.6rem;
-      font-size: 0.85rem;
-      font-weight: 300;
-      color: #8B6E4E;
-      letter-spacing: 0.02em;
-    }
-
-    .contact a {
-      font-size: 0.85rem;
-      font-weight: 400;
-      color: #C47A45;
-      text-decoration: none;
-      letter-spacing: 0.04em;
-      border-bottom: 1px solid rgba(196, 122, 69, 0.35);
-      padding-bottom: 1px;
-      transition: border-color 0.2s;
-    }
-
-    .contact a:hover {
-      border-color: #C47A45;
-    }
-
-    footer {
-      margin-top: 3.5rem;
-      font-size: 0.75rem;
-      font-weight: 300;
-      color: #8B6E4E;
-      letter-spacing: 0.06em;
+    @media (max-width: 768px) and (pointer: coarse) {
+      #mobile-notice { display: flex; }
     }
   </style>
 </head>
 <body>
-  <main>
-    <h1 class="artist-name">Asha Chokshi</h1>
-    <p class="tagline">Artist &middot; Canvas Paintings &middot; Sketches</p>
 
-    <hr class="divider" />
-
-    <div class="artwork-placeholder">
-      <span>Artwork coming soon</span>
+  <!-- Landing -->
+  <div id="landing">
+    <div id="door-surround">
+      <p id="gallery-sign">Asha Chokshi Gallery</p>
+      <div id="door-left" class="door-panel"><div class="door-handle"></div></div>
+      <div id="door-right" class="door-panel"><div class="door-handle"></div></div>
+      <div id="door-content">
+        <h1>Artworks by<br>Asha Chokshi</h1>
+        <p class="journey-label">Journey from 1972</p>
+        <button id="enter-btn">Take a look around ↗</button>
+      </div>
     </div>
+  </div>
 
-    <h2 class="coming-soon">Coming Soon</h2>
-    <p class="blurb">A curated collection of original works.<br />Launching soon.</p>
+  <!-- Gallery UI -->
+  <div id="controls-hint">Click to walk &nbsp;·&nbsp; W A S D to move &nbsp;·&nbsp; Mouse to look &nbsp;·&nbsp; ESC to pause</div>
+  <div id="crosshair">·</div>
+  <div id="lock-overlay">
+    <p>Click to resume</p>
+    <small>W A S D to walk · Mouse to look</small>
+  </div>
 
-    <p class="managed-by">This website is managed by her children.</p>
+  <!-- Mobile fallback -->
+  <div id="mobile-notice">
+    <h2>Artworks by Asha Chokshi</h2>
+    <p>Journey from 1972</p>
+    <p style="margin-top:0.5rem">Please visit on a desktop browser<br>for the full gallery experience.</p>
+    <p style="margin-top:1rem"><a href="mailto:chokshibhakti13@gmail.com">chokshibhakti13@gmail.com</a></p>
+  </div>
 
-    <div class="contact">
-      Please reach out at <a href="mailto:chokshibhakti13@gmail.com">chokshibhakti13@gmail.com</a>
-    </div>
-  </main>
+  <script type="importmap">
+  {
+    "imports": {
+      "three": "https://unpkg.com/three@0.158.0/build/three.module.js",
+      "three/addons/": "https://unpkg.com/three@0.158.0/examples/jsm/"
+    }
+  }
+  </script>
 
-  <footer>&copy; 2026 Asha Chokshi</footer>
+  <script type="module">
+  import * as THREE from 'three';
+  import { PointerLockControls } from 'three/addons/controls/PointerLockControls.js';
+
+  // ── Scene ────────────────────────────────────────────────────────────────────
+  const scene = new THREE.Scene();
+  scene.background = new THREE.Color(0xFFF6EC);
+  scene.fog = new THREE.FogExp2(0xFFF6EC, 0.028);
+
+  const camera = new THREE.PerspectiveCamera(68, innerWidth / innerHeight, 0.1, 60);
+  camera.position.set(0, 1.7, 8);
+
+  const renderer = new THREE.WebGLRenderer({ antialias: true });
+  renderer.setPixelRatio(Math.min(devicePixelRatio, 2));
+  renderer.setSize(innerWidth, innerHeight);
+  renderer.shadowMap.enabled = true;
+  renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+  renderer.toneMapping = THREE.ACESFilmicToneMapping;
+  renderer.toneMappingExposure = 1.2;
+  document.body.appendChild(renderer.domElement);
+
+  window.addEventListener('resize', () => {
+    camera.aspect = innerWidth / innerHeight;
+    camera.updateProjectionMatrix();
+    renderer.setSize(innerWidth, innerHeight);
+  });
+
+  // ── Room ─────────────────────────────────────────────────────────────────────
+  const W = 20, D = 22, H = 5;
+
+  const mWall  = new THREE.MeshStandardMaterial({ color: 0xF4EEE3, roughness: 0.96 });
+  const mFloor = new THREE.MeshStandardMaterial({ color: 0x7A5C3E, roughness: 0.82 });
+  const mCeil  = new THREE.MeshStandardMaterial({ color: 0xECE6D8, roughness: 1.0 });
+  const mBase  = new THREE.MeshStandardMaterial({ color: 0xC6B49A, roughness: 0.9 });
+
+  const plane = (w, h, mat, x, y, z, rx, ry) => {
+    const m = new THREE.Mesh(new THREE.PlaneGeometry(w, h), mat);
+    m.position.set(x, y, z);
+    if (rx) m.rotation.x = rx;
+    if (ry) m.rotation.y = ry;
+    m.receiveShadow = true;
+    scene.add(m);
+  };
+
+  plane(W, D, mFloor, 0,   0,   0,   -Math.PI/2);
+  plane(W, D, mCeil,  0,   H,   0,    Math.PI/2);
+  plane(W, H, mWall,  0,   H/2, -D/2);
+  plane(W, H, mWall,  0,   H/2,  D/2, 0, Math.PI);
+  plane(D, H, mWall,  W/2, H/2,  0,   0, -Math.PI/2);
+  plane(D, H, mWall, -W/2, H/2,  0,   0,  Math.PI/2);
+
+  // Baseboards
+  const addBase = (sx, sz, x, z, ry) => {
+    const b = new THREE.Mesh(new THREE.BoxGeometry(sx, 0.14, sz), mBase);
+    b.position.set(x, 0.07, z);
+    if (ry) b.rotation.y = ry;
+    scene.add(b);
+  };
+  addBase(W, 0.06, 0,      -D/2+0.03);
+  addBase(W, 0.06, 0,       D/2-0.03);
+  addBase(0.06, D, W/2-0.03, 0);
+  addBase(0.06, D,-W/2+0.03, 0);
+
+  // ── Ceiling track lights (geometry) ──────────────────────────────────────────
+  const mTrack = new THREE.MeshStandardMaterial({
+    color: 0xDDD0C0,
+    emissive: 0xFFE4A0,
+    emissiveIntensity: 0.35,
+  });
+  [-5, 0, 5].forEach(x => {
+    const t = new THREE.Mesh(new THREE.BoxGeometry(0.07, 0.04, D - 2), mTrack);
+    t.position.set(x, H - 0.03, 0);
+    scene.add(t);
+  });
+
+  // ── Painting factory ──────────────────────────────────────────────────────────
+  const FRAME_COLORS = [0x2C1810, 0x3D2B1A, 0xC9A84C, 0x1C1C1C, 0x4A3728];
+
+  function makePainting(w, h, color, fi = 0) {
+    const g = new THREE.Group();
+
+    // Frame
+    const fMat = new THREE.MeshStandardMaterial({ color: FRAME_COLORS[fi % 5], roughness: 0.7 });
+    const frame = new THREE.Mesh(new THREE.BoxGeometry(w + 0.10, h + 0.10, 0.055), fMat);
+    frame.castShadow = true;
+    g.add(frame);
+
+    // Canvas face
+    const cMat = new THREE.MeshStandardMaterial({ color, roughness: 0.9 });
+    const cv = new THREE.Mesh(new THREE.BoxGeometry(w, h, 0.05), cMat);
+    cv.position.z = 0.015;
+    g.add(cv);
+
+    // Label card below
+    const lMat = new THREE.MeshStandardMaterial({ color: 0xF4EEE3, roughness: 1 });
+    const lbl = new THREE.Mesh(new THREE.BoxGeometry(0.32, 0.09, 0.01), lMat);
+    lbl.position.set(0, -(h / 2 + 0.13), 0.03);
+    g.add(lbl);
+
+    return g;
+  }
+
+  function hang(x, y, z, ry, w, h, col, fi) {
+    const p = makePainting(w, h, col, fi);
+    p.position.set(x, y, z);
+    p.rotation.y = ry;
+    scene.add(p);
+  }
+
+  function lean(x, z, ry, w, h, col, fi) {
+    const g = new THREE.Group();
+    const p = makePainting(w, h, col, fi);
+    p.position.y = h / 2;
+    g.add(p);
+    g.position.set(x, 0, z);
+    g.rotation.order = 'YXZ';
+    g.rotation.y = ry;
+    g.rotation.x = 0.21; // lean ~12° from vertical into wall
+    scene.add(g);
+  }
+
+  // ── Gallery layout ─────────────────────────────────────────────────────────
+  // Walls:  North z=-11  South z=+11  East x=+10  West x=-10
+  const NZ = -D/2 + 0.06, SZ = D/2 - 0.06;
+  const EX =  W/2 - 0.06, WX = -W/2 + 0.06;
+
+  // — North wall (5 hung, 4 leaning) —
+  hang(-7,   2.5,  NZ, 0, 1.0, 1.4, 0xC4783C, 0);
+  hang(-3.5, 2.25, NZ, 0, 1.6, 1.0, 0x4A6741, 2);
+  hang( 0,   2.6,  NZ, 0, 0.9, 1.3, 0x8B3A3A, 0);
+  hang( 3.5, 2.2,  NZ, 0, 1.5, 0.9, 0x2C5F8A, 1);
+  hang( 7,   2.45, NZ, 0, 1.1, 1.5, 0xDAA520, 3);
+
+  lean(-5.8, -D/2 + 0.38, 0, 1.0, 0.8, 0x5C4033, 0);
+  lean(-4.5, -D/2 + 0.28, 0, 0.75,1.2, 0x3A5F4E, 1);
+  lean( 5.0, -D/2 + 0.38, 0, 1.2, 0.9, 0x8B6914, 4);
+  lean( 6.2, -D/2 + 0.28, 0, 0.8, 1.1, 0x7B3F00, 0);
+
+  // — South wall (4 hung, 3 leaning) —
+  hang(-6,   2.4,  SZ, Math.PI, 1.2, 0.9, 0xB5651D, 0);
+  hang(-2,   2.6,  SZ, Math.PI, 0.85,1.3, 0x556B2F, 2);
+  hang( 2,   2.3,  SZ, Math.PI, 1.5, 1.0, 0xA0522D, 1);
+  hang( 6,   2.5,  SZ, Math.PI, 0.9, 1.2, 0x2F4F4F, 3);
+
+  lean( 3.5,  D/2 - 0.38, Math.PI, 1.1, 0.85, 0x7F4E1E, 0);
+  lean( 4.8,  D/2 - 0.28, Math.PI, 0.75,1.1,  0x2B4C7E, 1);
+  lean(-5.0,  D/2 - 0.38, Math.PI, 1.3, 0.9,  0x6B3A2A, 0);
+
+  // — East wall (3 hung, 2 leaning) —
+  hang(EX, 2.5, -5.5, -Math.PI/2, 1.0, 1.45, 0xC49A3C, 2);
+  hang(EX, 2.3,  0.5, -Math.PI/2, 1.5, 0.9,  0x8B0000, 0);
+  hang(EX, 2.45, 6,   -Math.PI/2, 0.9, 1.2,  0x4682B4, 1);
+
+  lean(W/2 - 0.38, -3.0, -Math.PI/2, 1.0, 0.8,  0xC49A3C, 0);
+  lean(W/2 - 0.28,  4.5, -Math.PI/2, 0.8, 1.15, 0x6B3A2A, 3);
+
+  // — West wall (3 hung, 2 leaning) —
+  hang(WX, 2.4, -5,   Math.PI/2, 1.3, 1.0,  0xCD853F, 1);
+  hang(WX, 2.6,  1,   Math.PI/2, 0.8, 1.15, 0x6B8E23, 0);
+  hang(WX, 2.3,  6.5, Math.PI/2, 1.4, 0.8,  0x8B4513, 2);
+
+  lean(-W/2 + 0.38,  3.0, Math.PI/2, 1.0, 1.3,  0x4A7C59, 0);
+  lean(-W/2 + 0.28, -4.5, Math.PI/2, 1.2, 0.85, 0xDAA520, 4);
+
+  // ── Bench ─────────────────────────────────────────────────────────────────────
+  const mBench = new THREE.MeshStandardMaterial({ color: 0x3D2B1A, roughness: 0.8 });
+  const bench = new THREE.Mesh(new THREE.BoxGeometry(2.4, 0.08, 0.55), mBench);
+  bench.position.set(0, 0.44, 0);
+  bench.castShadow = true;
+  scene.add(bench);
+  [-1.1, 1.1].forEach(lx => {
+    const leg = new THREE.Mesh(new THREE.BoxGeometry(0.07, 0.44, 0.5), mBench);
+    leg.position.set(lx, 0.22, 0);
+    scene.add(leg);
+  });
+
+  // ── Lighting ──────────────────────────────────────────────────────────────────
+  scene.add(new THREE.AmbientLight(0xFFF4E0, 0.5));
+
+  // Ceiling fill
+  const fills = [[0,H-0.1,0],[-5,H-0.1,-5],[5,H-0.1,-5],[-5,H-0.1,5],[5,H-0.1,5]];
+  fills.forEach(([x,y,z]) => {
+    const l = new THREE.PointLight(0xFFE4C0, 0.45, 20);
+    l.position.set(x, y, z);
+    scene.add(l);
+  });
+
+  // Wall spots — warm accent lights above each painting cluster
+  [
+    // North
+    [-7,H-0.4,-D/2+2], [-3.5,H-0.4,-D/2+2], [0,H-0.4,-D/2+2], [3.5,H-0.4,-D/2+2], [7,H-0.4,-D/2+2],
+    // South
+    [-6,H-0.4,D/2-2], [-2,H-0.4,D/2-2], [2,H-0.4,D/2-2], [6,H-0.4,D/2-2],
+    // East
+    [W/2-2,H-0.4,-5.5], [W/2-2,H-0.4,0.5], [W/2-2,H-0.4,6],
+    // West
+    [-W/2+2,H-0.4,-5], [-W/2+2,H-0.4,1], [-W/2+2,H-0.4,6.5],
+  ].forEach(([x,y,z]) => {
+    const l = new THREE.PointLight(0xFFCC70, 0.8, 7);
+    l.position.set(x, y, z);
+    scene.add(l);
+  });
+
+  // ── Controls ──────────────────────────────────────────────────────────────────
+  const controls = new PointerLockControls(camera, document.body);
+
+  const keys = {};
+  document.addEventListener('keydown', e => { keys[e.code] = true; });
+  document.addEventListener('keyup',   e => { keys[e.code] = false; });
+
+  const SPEED  = 5;
+  const moveDir = new THREE.Vector3();
+  let prevT = performance.now();
+
+  function updateMovement() {
+    const now = performance.now();
+    const dt  = Math.min((now - prevT) / 1000, 0.05);
+    prevT = now;
+    if (!controls.isLocked) return;
+
+    moveDir.set(0, 0, 0);
+    if (keys['KeyW'] || keys['ArrowUp'])    moveDir.z -= 1;
+    if (keys['KeyS'] || keys['ArrowDown'])  moveDir.z += 1;
+    if (keys['KeyA'] || keys['ArrowLeft'])  moveDir.x -= 1;
+    if (keys['KeyD'] || keys['ArrowRight']) moveDir.x += 1;
+    if (moveDir.lengthSq() > 0) moveDir.normalize();
+
+    controls.moveForward(-moveDir.z * SPEED * dt);
+    controls.moveRight(   moveDir.x * SPEED * dt);
+
+    const M = 0.55;
+    camera.position.x = Math.max(-W/2 + M, Math.min(W/2 - M, camera.position.x));
+    camera.position.z = Math.max(-D/2 + M, Math.min(D/2 - M, camera.position.z));
+    camera.position.y = 1.7;
+  }
+
+  // ── Pointer lock events ───────────────────────────────────────────────────────
+  const lockOverlay  = document.getElementById('lock-overlay');
+  const crosshair    = document.getElementById('crosshair');
+  const hint         = document.getElementById('controls-hint');
+
+  controls.addEventListener('lock', () => {
+    lockOverlay.style.display = 'none';
+    crosshair.style.display   = 'block';
+    hint.style.display        = 'block';
+  });
+  controls.addEventListener('unlock', () => {
+    lockOverlay.style.display = 'flex';
+    crosshair.style.display   = 'none';
+  });
+  lockOverlay.addEventListener('click', () => controls.lock());
+
+  // ── Door entry ────────────────────────────────────────────────────────────────
+  document.getElementById('enter-btn').addEventListener('click', () => {
+    document.getElementById('door-left').classList.add('open');
+    document.getElementById('door-right').classList.add('open');
+
+    const landing = document.getElementById('landing');
+    setTimeout(() => {
+      landing.classList.add('fade-out');
+      setTimeout(() => {
+        landing.style.display = 'none';
+        lockOverlay.style.display = 'flex';
+      }, 800);
+    }, 950);
+  });
+
+  // ── Render loop ───────────────────────────────────────────────────────────────
+  function animate() {
+    requestAnimationFrame(animate);
+    updateMovement();
+    renderer.render(scene, camera);
+  }
+  animate();
+  </script>
 </body>
 </html>
