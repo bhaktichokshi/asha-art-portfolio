@@ -170,15 +170,45 @@
     /* ── Hint bar ─────────────────────────────────────────────── */
     #hint {
       display: none;
-      position: fixed; bottom: 20px;
-      left: 50%; transform: translateX(-50%);
+      position: fixed; bottom: 20px; left: 20px;
       z-index: 30;
-      color: rgba(245,238,227,0.68);
+      color: rgba(245,238,227,0.66);
       font-size: 0.72rem; letter-spacing: 0.06em;
-      background: rgba(14,7,3,0.58);
-      padding: 0.4rem 1rem;
+      background: rgba(14,7,3,0.55);
+      padding: 0.4rem 0.9rem;
       white-space: nowrap; pointer-events: none;
     }
+
+    /* ── On-screen look d-pad ─────────────────────────────────── */
+    #look-pad {
+      position: fixed; bottom: 22px; left: 50%;
+      transform: translateX(-50%);
+      z-index: 30;
+      display: none;
+      grid-template-columns: repeat(3, 42px);
+      grid-template-rows: repeat(3, 42px);
+      gap: 5px;
+    }
+    #look-pad.active { display: grid; }
+    .lp {
+      background: rgba(18,10,5,0.5);
+      backdrop-filter: blur(6px);
+      -webkit-backdrop-filter: blur(6px);
+      border: 1px solid rgba(196,122,69,0.42);
+      color: rgba(248,240,227,0.85);
+      font-size: 0.72rem; line-height: 1;
+      cursor: pointer; border-radius: 6px;
+      display: flex; align-items: center; justify-content: center;
+      user-select: none; -webkit-user-select: none;
+      touch-action: none;
+      transition: background 0.15s, border-color 0.15s;
+    }
+    .lp:hover  { background: rgba(196,122,69,0.32); }
+    .lp:active { background: rgba(196,122,69,0.55); border-color: rgba(196,122,69,0.75); }
+    .lp-up    { grid-column: 2; grid-row: 1; }
+    .lp-left  { grid-column: 1; grid-row: 2; }
+    .lp-right { grid-column: 3; grid-row: 2; }
+    .lp-down  { grid-column: 2; grid-row: 3; }
 
     /* ── Info panel ───────────────────────────────────────────── */
     #info-panel {
@@ -270,7 +300,15 @@
     <p id="info-note">—</p>
   </div>
 
-  <div id="hint">Drag to look around &nbsp;·&nbsp; Click floor to walk &nbsp;·&nbsp; Click artwork for details</div>
+  <div id="hint">Drag or use the arrows to look &nbsp;·&nbsp; Click the floor to walk &nbsp;·&nbsp; Click a piece for details</div>
+
+  <!-- On-screen look controls (also works with keyboard arrow keys) -->
+  <div id="look-pad">
+    <button class="lp lp-up"    data-look="up"    aria-label="Look up">▲</button>
+    <button class="lp lp-left"  data-look="left"  aria-label="Look left">◀</button>
+    <button class="lp lp-right" data-look="right" aria-label="Look right">▶</button>
+    <button class="lp lp-down"  data-look="down"  aria-label="Look down">▼</button>
+  </div>
 
   <div id="mobile-notice">
     <h2>Artworks by Asha Chokshi</h2>
@@ -306,7 +344,7 @@
   camera.rotation.order = 'YXZ';
 
   const renderer = new THREE.WebGLRenderer({ antialias: true });
-  renderer.setPixelRatio(Math.min(devicePixelRatio, 1.5)); // cap fill-rate on Retina/4K
+  renderer.setPixelRatio(Math.min(devicePixelRatio, 2)); // full Retina sharpness
   renderer.setSize(innerWidth, innerHeight);
   renderer.shadowMap.enabled = true;
   renderer.shadowMap.type = THREE.PCFSoftShadowMap;
@@ -915,9 +953,16 @@
     scene.add(l);
   });
 
-  // ── Navigation: click-to-move + drag-to-look ─────────────────────────────────
+  // ── Navigation: click-to-move + drag-to-look + arrow look ────────────────────
   let yaw = 0, pitch = 0;
   let isDragging = false, mouseDownX = 0, mouseDownY = 0, lastMX = 0, lastMY = 0;
+
+  // Held-look via arrow keys / on-screen d-pad (an alternative to dragging)
+  const look = { left: false, right: false, up: false, down: false };
+  const LOOK_SPEED = 1.2; // radians / second
+  const keyLook = { ArrowLeft: 'left', ArrowRight: 'right', ArrowUp: 'up', ArrowDown: 'down' };
+  addEventListener('keydown', e => { if (keyLook[e.key]) { look[keyLook[e.key]] = true;  e.preventDefault(); } });
+  addEventListener('keyup',   e => { if (keyLook[e.key]) { look[keyLook[e.key]] = false; } });
 
   // Smooth move tween
   let moveStart = null, moveTarget = null, moveTween = 1;
@@ -957,8 +1002,9 @@
         isDragging = true;
       }
       if (isDragging) {
-        yaw   -= dx * 0.0025;
-        pitch  = Math.max(-1.05, Math.min(1.05, pitch - dy * 0.0025));
+        // inverted "grab the scene" feel: drag left pulls the view left
+        yaw   += dx * 0.0025;
+        pitch  = Math.max(-1.05, Math.min(1.05, pitch + dy * 0.0025));
         camera.rotation.y = yaw;
         camera.rotation.x = pitch;
       }
@@ -1020,6 +1066,17 @@
     if (e.key === 'Escape') panel.classList.remove('visible');
   });
 
+  // On-screen d-pad → same held-look as the arrow keys
+  document.querySelectorAll('.lp').forEach(btn => {
+    const dir = btn.dataset.look;
+    const on  = e => { e.preventDefault(); look[dir] = true;  };
+    const off = () => { look[dir] = false; };
+    btn.addEventListener('pointerdown', on);
+    btn.addEventListener('pointerup', off);
+    btn.addEventListener('pointerleave', off);
+    btn.addEventListener('pointercancel', off);
+  });
+
   // ── Door entry ────────────────────────────────────────────────────────────────
   document.getElementById('enter-btn').addEventListener('click', () => {
     document.getElementById('door-left').classList.add('open');
@@ -1030,6 +1087,7 @@
       setTimeout(() => {
         landing.style.display = 'none';
         document.getElementById('hint').style.display = 'block';
+        document.getElementById('look-pad').classList.add('active');
       }, 800);
     }, 950);
   });
@@ -1037,7 +1095,11 @@
   // ── Post-processing: gentle bloom only on real highlights (fixtures) ───────────
   // High threshold so only genuine highlights glow — walls no longer bloom.
   // Vignette removed (it was darkening the screen corners artificially).
-  composer = new EffectComposer(renderer);
+  // Multisampled (MSAA) buffer so geometry edges stay smooth through the composer
+  // — plain antialias:true is ignored once you render via EffectComposer.
+  const dbs = renderer.getDrawingBufferSize(new THREE.Vector2());
+  const composerRT = new THREE.WebGLRenderTarget(dbs.x, dbs.y, { type: THREE.HalfFloatType, samples: 4 });
+  composer = new EffectComposer(renderer, composerRT);
   composer.addPass(new RenderPass(scene, camera));
   composer.addPass(new UnrealBloomPass(new THREE.Vector2(innerWidth, innerHeight), 0.15, 0.4, 0.95));
   composer.addPass(new OutputPass());
@@ -1062,6 +1124,16 @@
       moveTween = Math.min(1, moveTween + dt / MOVE_SPEED);
       const t = 1 - Math.pow(1 - moveTween, 3); // ease-out cubic
       camera.position.lerpVectors(moveStart, moveTarget, t);
+    }
+
+    // Held arrow-look
+    if (look.left || look.right || look.up || look.down) {
+      if (look.left)  yaw   += LOOK_SPEED * dt;
+      if (look.right) yaw   -= LOOK_SPEED * dt;
+      if (look.up)    pitch  = Math.min( 1.05, pitch + LOOK_SPEED * dt);
+      if (look.down)  pitch  = Math.max(-1.05, pitch - LOOK_SPEED * dt);
+      camera.rotation.y = yaw;
+      camera.rotation.x = pitch;
     }
 
     composer.render();
