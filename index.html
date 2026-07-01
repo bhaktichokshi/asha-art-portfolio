@@ -300,7 +300,7 @@
     <p id="info-note">—</p>
   </div>
 
-  <div id="hint">Drag or use the arrows to look &nbsp;·&nbsp; Click the floor to walk &nbsp;·&nbsp; Click a piece for details</div>
+  <div id="hint">Drag or arrows to look &nbsp;·&nbsp; Click floor or scroll to move &nbsp;·&nbsp; Click a piece for details</div>
 
   <!-- On-screen look controls (also works with keyboard arrow keys) -->
   <div id="look-pad">
@@ -1047,6 +1047,23 @@
       moveTween  = 0;
     }
   });
+
+  // Scroll / two-finger swipe = dolly forward & back along the view ("zoom"),
+  // so you can always reverse out — e.g. after moving up to a wall.
+  const dollyDir = new THREE.Vector3();
+  canvas.addEventListener('wheel', e => {
+    e.preventDefault();
+    moveTarget = null; // stop any click-to-move tween that's in progress
+    camera.getWorldDirection(dollyDir);
+    dollyDir.y = 0;
+    if (dollyDir.lengthSq() < 1e-6) return;
+    dollyDir.normalize();
+    const step = -e.deltaY * 0.01;            // wheel up / swipe up = forward
+    const M = 0.65;
+    camera.position.x = Math.max(-W/2 + M, Math.min(W/2 - M, camera.position.x + dollyDir.x * step));
+    camera.position.z = Math.max(-D/2 + M, Math.min(D/2 - M, camera.position.z + dollyDir.z * step));
+    camera.position.y = 1.7;
+  }, { passive: false });
 
   // ── Info panel ────────────────────────────────────────────────────────────────
   const panel     = document.getElementById('info-panel');
