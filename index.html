@@ -294,16 +294,14 @@
   import { EffectComposer }    from 'three/addons/postprocessing/EffectComposer.js';
   import { RenderPass }        from 'three/addons/postprocessing/RenderPass.js';
   import { UnrealBloomPass }   from 'three/addons/postprocessing/UnrealBloomPass.js';
-  import { ShaderPass }        from 'three/addons/postprocessing/ShaderPass.js';
   import { OutputPass }        from 'three/addons/postprocessing/OutputPass.js';
-  import { VignetteShader }    from 'three/addons/shaders/VignetteShader.js';
 
   // ── Scene ────────────────────────────────────────────────────────────────────
   const scene = new THREE.Scene();
-  scene.background = new THREE.Color(0xF4ECE2);
-  scene.fog = new THREE.FogExp2(0xF1E8DC, 0.016);
+  scene.background = new THREE.Color(0xEDE4D6);
+  scene.fog = new THREE.FogExp2(0xEBE1D2, 0.006);
 
-  const camera = new THREE.PerspectiveCamera(68, innerWidth / innerHeight, 0.1, 60);
+  const camera = new THREE.PerspectiveCamera(52, innerWidth / innerHeight, 0.1, 60);
   camera.position.set(0, 1.7, 7);
   camera.rotation.order = 'YXZ';
 
@@ -313,8 +311,8 @@
   renderer.shadowMap.enabled = true;
   renderer.shadowMap.type = THREE.PCFSoftShadowMap;
   renderer.toneMapping = THREE.ACESFilmicToneMapping;
-  renderer.toneMappingExposure = 1.1;
-  renderer.useLegacyLights = true;   // intuitive 0-1 light intensities
+  renderer.toneMappingExposure = 1.05;
+  renderer.useLegacyLights = false;  // physically-based lighting (inverse-square falloff)
   document.body.appendChild(renderer.domElement);
 
   let composer; // assigned after the scene is built
@@ -455,12 +453,12 @@
   // ── Room ─────────────────────────────────────────────────────────────────────
   const W = 20, D = 22, H = 5;
 
-  // Pale white plaster walls + polished wood floor
-  const mWall  = new THREE.MeshStandardMaterial({ color: 0xF2F0ED, map: plasterTex, roughness: 0.95, metalness: 0, envMapIntensity: 0.25 });
+  // Warm off-white plaster walls (mid-tone, so accent light has headroom) + polished wood floor
+  const mWall  = new THREE.MeshStandardMaterial({ color: 0xD8D2C8, map: plasterTex, roughness: 0.92, metalness: 0, envMapIntensity: 0.6 });
   const mFloor = new THREE.MeshStandardMaterial({ color: 0x8A6A45, map: woodTex, roughness: 0.5, metalness: 0.12, envMapIntensity: 0.6 });
-  const mCeil  = new THREE.MeshStandardMaterial({ color: 0xEDEBE6, roughness: 1.0  });
-  const mBase  = new THREE.MeshStandardMaterial({ color: 0xC8BEB0, roughness: 0.9  });
-  const mCrown = new THREE.MeshStandardMaterial({ color: 0xE4DFD5, roughness: 0.85 });
+  const mCeil  = new THREE.MeshStandardMaterial({ color: 0xD6D1C8, roughness: 1.0  });
+  const mBase  = new THREE.MeshStandardMaterial({ color: 0xBEB4A6, roughness: 0.9  });
+  const mCrown = new THREE.MeshStandardMaterial({ color: 0xD8D3C9, roughness: 0.85 });
 
   const addPlane = (w, h, mat, x, y, z, rx, ry) => {
     const m = new THREE.Mesh(new THREE.PlaneGeometry(w, h), mat);
@@ -867,24 +865,28 @@
     scene.add(leg);
   });
 
-  // ── Lighting — soft base + warm gallery spotlights ────────────────────────────
-  scene.add(new THREE.HemisphereLight(0xFFF6E8, 0x4A3520, 0.45));
-  scene.add(new THREE.AmbientLight(0xFFF0DC, 0.16));
+  // ── Lighting — physically-based: soft even base + warm accent spots ────────────
+  // Values are in physical units (inverse-square falloff), tuned so walls sit at a
+  // mid-tone and the accent pools fall off naturally instead of clipping to white.
+  scene.add(new THREE.HemisphereLight(0xFFF4E6, 0x6A5238, 0.7));
+  scene.add(new THREE.AmbientLight(0xFFF2E4, 0.3));
 
-  const housingMat = new THREE.MeshStandardMaterial({ color: 0x2A2622, roughness: 0.5, metalness: 0.6, emissive: 0xFFE4A8, emissiveIntensity: 0.35 });
+  const housingMat = new THREE.MeshStandardMaterial({ color: 0x2A2622, roughness: 0.5, metalness: 0.6, emissive: 0xFFDCA0, emissiveIntensity: 0.5 });
   let shadowBudget = 6; // cap on shadow-casting spots (perf)
 
-  function spot(px, pz, tx, tz, ty = 2.5, intensity = 1.15) {
-    const sp = new THREE.SpotLight(0xFFE3B0, intensity, 18, Math.PI / 6, 0.5, 1);
+  function spot(px, pz, tx, tz, ty = 2.5, intensity = 17) {
+    // decay 2 = physical inverse-square; wide penumbra for a soft-edged pool
+    const sp = new THREE.SpotLight(0xFFE6BE, intensity, 26, Math.PI / 6, 0.8, 2);
     sp.position.set(px, H - 0.22, pz);
     sp.target.position.set(tx, ty, tz);
     scene.add(sp); scene.add(sp.target);
     if (shadowBudget > 0) {
       sp.castShadow = true; shadowBudget--;
-      sp.shadow.mapSize.set(1024, 1024);
+      sp.shadow.mapSize.set(2048, 2048);
       sp.shadow.camera.near = 0.5;
-      sp.shadow.camera.far  = 20;
-      sp.shadow.bias = -0.0006;
+      sp.shadow.camera.far  = 22;
+      sp.shadow.bias = -0.0005;
+      sp.shadow.radius = 3;
     }
     // visible ceiling fixture aimed at the wall
     const hs = new THREE.Mesh(new THREE.CylinderGeometry(0.05, 0.075, 0.13, 10), housingMat);
@@ -903,10 +905,10 @@
   // South collectors
   [-6.5, -3.5, -0.5, 2.5, 5, 7].forEach(x => spot(x, SZ - 2.6, x, SZ));
 
-  // Gentle ceiling fills so the middle of the room isn't black
-  [[-5,-5],[5,-5],[-5,5],[5,5],[0,0]].forEach(([x,z]) => {
-    const l = new THREE.PointLight(0xFFE7C4, 0.22, 16, 1);
-    l.position.set(x, H - 0.3, z);
+  // Soft overhead fill across a grid so the floor + corners read evenly (no black corners)
+  [[-6,-7],[6,-7],[-6,7],[6,7],[0,-7],[0,7],[-6,0],[6,0],[0,0]].forEach(([x,z]) => {
+    const l = new THREE.PointLight(0xFFEAD2, 9, 30, 2);
+    l.position.set(x, H - 0.5, z);
     scene.add(l);
   });
 
@@ -1029,14 +1031,12 @@
     }, 950);
   });
 
-  // ── Post-processing: subtle bloom + vignette ──────────────────────────────────
+  // ── Post-processing: gentle bloom only on real highlights (fixtures) ───────────
+  // High threshold so only genuine highlights glow — walls no longer bloom.
+  // Vignette removed (it was darkening the screen corners artificially).
   composer = new EffectComposer(renderer);
   composer.addPass(new RenderPass(scene, camera));
-  composer.addPass(new UnrealBloomPass(new THREE.Vector2(innerWidth, innerHeight), 0.22, 0.6, 0.85));
-  const vignette = new ShaderPass(VignetteShader);
-  vignette.uniforms.offset.value   = 1.0;
-  vignette.uniforms.darkness.value = 1.2;
-  composer.addPass(vignette);
+  composer.addPass(new UnrealBloomPass(new THREE.Vector2(innerWidth, innerHeight), 0.15, 0.4, 0.95));
   composer.addPass(new OutputPass());
 
   // ── Render loop ───────────────────────────────────────────────────────────────
