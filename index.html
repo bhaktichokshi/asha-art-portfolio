@@ -209,6 +209,8 @@
     .lp-left  { grid-column: 1; grid-row: 2; }
     .lp-right { grid-column: 3; grid-row: 2; }
     .lp-down  { grid-column: 2; grid-row: 3; }
+    .lp-zin   { grid-column: 3; grid-row: 1; font-size: 1rem; }
+    .lp-zout  { grid-column: 3; grid-row: 3; font-size: 1rem; }
 
     /* ── Info panel ───────────────────────────────────────────── */
     #info-panel {
@@ -302,11 +304,13 @@
 
   <div id="hint">Drag or arrows to look &nbsp;·&nbsp; Click floor or scroll to move &nbsp;·&nbsp; Click a piece for details</div>
 
-  <!-- On-screen look controls (also works with keyboard arrow keys) -->
+  <!-- On-screen look + zoom controls (also works with arrow keys and +/- keys) -->
   <div id="look-pad">
+    <button class="lp lp-zin"   data-look="zin"   aria-label="Zoom in">+</button>
     <button class="lp lp-up"    data-look="up"    aria-label="Look up">▲</button>
     <button class="lp lp-left"  data-look="left"  aria-label="Look left">◀</button>
     <button class="lp lp-right" data-look="right" aria-label="Look right">▶</button>
+    <button class="lp lp-zout"  data-look="zout"  aria-label="Zoom out">−</button>
     <button class="lp lp-down"  data-look="down"  aria-label="Look down">▼</button>
   </div>
 
@@ -967,9 +971,13 @@
   let isDragging = false, mouseDownX = 0, mouseDownY = 0, lastMX = 0, lastMY = 0;
 
   // Held-look via arrow keys / on-screen d-pad (an alternative to dragging)
-  const look = { left: false, right: false, up: false, down: false };
+  const look = { left: false, right: false, up: false, down: false, zin: false, zout: false };
   const LOOK_SPEED = 1.2; // radians / second
-  const keyLook = { ArrowLeft: 'left', ArrowRight: 'right', ArrowUp: 'up', ArrowDown: 'down' };
+  const ZOOM_SPEED = 3.2; // metres / second (dolly)
+  const keyLook = {
+    ArrowLeft: 'left', ArrowRight: 'right', ArrowUp: 'up', ArrowDown: 'down',
+    '+': 'zin', '=': 'zin', '-': 'zout', '_': 'zout',
+  };
   addEventListener('keydown', e => { if (keyLook[e.key]) { look[keyLook[e.key]] = true;  e.preventDefault(); } });
   addEventListener('keyup',   e => { if (keyLook[e.key]) { look[keyLook[e.key]] = false; } });
 
@@ -1057,22 +1065,21 @@
     }
   });
 
-  // Scroll / two-finger swipe = dolly forward & back along the view ("zoom"),
-  // so you can always reverse out — e.g. after moving up to a wall.
+  // Dolly forward & back along the view ("zoom") — used by the wheel, the on-screen
+  // +/- buttons, and the +/- keys. Clamped so you can always reverse out of a wall.
   const dollyDir = new THREE.Vector3();
-  canvas.addEventListener('wheel', e => {
-    e.preventDefault();
+  function dolly(step) {
     moveTarget = null; // stop any click-to-move tween that's in progress
     camera.getWorldDirection(dollyDir);
     dollyDir.y = 0;
     if (dollyDir.lengthSq() < 1e-6) return;
     dollyDir.normalize();
-    const step = -e.deltaY * 0.01;            // wheel up / swipe up = forward
     const M = 0.65;
     camera.position.x = Math.max(-W/2 + M, Math.min(W/2 - M, camera.position.x + dollyDir.x * step));
     camera.position.z = Math.max(-D/2 + M, Math.min(D/2 - M, camera.position.z + dollyDir.z * step));
     camera.position.y = 1.7;
-  }, { passive: false });
+  }
+  canvas.addEventListener('wheel', e => { e.preventDefault(); dolly(-e.deltaY * 0.01); }, { passive: false });
 
   // ── Info panel ────────────────────────────────────────────────────────────────
   const panel     = document.getElementById('info-panel');
@@ -1161,6 +1168,10 @@
       camera.rotation.y = yaw;
       camera.rotation.x = pitch;
     }
+
+    // Held zoom (dolly)
+    if (look.zin)  dolly( ZOOM_SPEED * dt);
+    if (look.zout) dolly(-ZOOM_SPEED * dt);
 
     composer.render();
   }
