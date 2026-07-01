@@ -76,10 +76,12 @@
     #door-content {
       position: absolute; inset: 0;
       display: flex; flex-direction: column;
-      align-items: center; justify-content: space-between;
-      padding: 9% 1.8rem 8%;
+      align-items: center; justify-content: space-evenly;
+      padding: 4% 1.8rem;
       z-index: 2; text-align: center;
       pointer-events: none;
+      /* subtle smoked-glass scrim so text stays legible over the wood floor */
+      background: linear-gradient(to bottom, rgba(22,12,5,0.30), rgba(22,12,5,0.14) 45%, rgba(22,12,5,0.34));
     }
 
     .dc-top {
@@ -87,14 +89,15 @@
       align-items: center; gap: 0.55rem;
     }
     .dc-artworks {
-      font-size: 0.62rem;
+      font-size: 0.64rem;
       letter-spacing: 0.38em;
       text-transform: uppercase;
-      color: rgba(196,122,69,0.82);
+      color: rgba(252,244,232,0.95);
+      text-shadow: 0 1px 10px rgba(0,0,0,0.6);
     }
     .dc-rule {
       width: 48px; height: 1px;
-      background: rgba(196,122,69,0.35);
+      background: rgba(226,168,120,0.7);
     }
 
     .dc-mid {
@@ -105,7 +108,8 @@
       font-family: 'Playfair Display', serif;
       font-style: italic;
       font-size: 0.85rem;
-      color: rgba(248,240,227,0.65);
+      color: rgba(250,242,230,0.8);
+      text-shadow: 0 1px 8px rgba(0,0,0,0.55);
     }
     #door-content h1 {
       font-family: 'Playfair Display', serif;
@@ -119,7 +123,8 @@
       font-size: 0.7rem;
       letter-spacing: 0.2em;
       text-transform: uppercase;
-      color: rgba(196,122,69,0.75);
+      color: rgba(244,214,180,0.92);
+      text-shadow: 0 1px 10px rgba(0,0,0,0.6);
       margin-top: 0.15rem;
     }
 
@@ -131,7 +136,8 @@
     .dc-nudge {
       font-size: 0.74rem;
       letter-spacing: 0.1em;
-      color: rgba(248,240,227,0.5);
+      color: rgba(250,242,230,0.72);
+      text-shadow: 0 1px 8px rgba(0,0,0,0.5);
       pointer-events: none;
     }
     #enter-btn {
@@ -152,13 +158,14 @@
     .dc-email {
       font-size: 0.68rem;
       letter-spacing: 0.07em;
-      color: rgba(196,122,69,0.62);
+      color: rgba(246,214,182,0.88);
+      text-shadow: 0 1px 8px rgba(0,0,0,0.55);
       text-decoration: none;
-      border-bottom: 1px solid rgba(196,122,69,0.25);
+      border-bottom: 1px solid rgba(246,214,182,0.4);
       padding-bottom: 1px;
       pointer-events: all;
     }
-    .dc-email:hover { color: rgba(196,122,69,0.9); }
+    .dc-email:hover { color: rgba(255,232,206,1); }
 
     /* ── Hint bar ─────────────────────────────────────────────── */
     #hint {
@@ -574,9 +581,10 @@
     g.position.set(x, 0, z);
     g.rotation.order = 'YXZ';
     g.rotation.y = ry;
-    // north wall (ry≈0): +angle leans top toward -Z (toward north wall)
-    // all other walls:   -angle leans top toward their respective wall
-    g.rotation.x = Math.abs(ry) < 0.01 ? 0.20 : -0.20;
+    // With YXZ order, a negative X-tilt leans the top toward the wall the piece
+    // faces — correct for every wall (the old +angle special-case tipped the
+    // centre/north pieces forward into the room).
+    g.rotation.x = -0.20;
     if (meta) { g.userData.meta = meta; paintings.push(g); }
     scene.add(g);
     addContactShadow(x, z, w);
