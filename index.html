@@ -306,7 +306,7 @@
   camera.rotation.order = 'YXZ';
 
   const renderer = new THREE.WebGLRenderer({ antialias: true });
-  renderer.setPixelRatio(Math.min(devicePixelRatio, 2));
+  renderer.setPixelRatio(Math.min(devicePixelRatio, 1.5)); // cap fill-rate on Retina/4K
   renderer.setSize(innerWidth, innerHeight);
   renderer.shadowMap.enabled = true;
   renderer.shadowMap.type = THREE.PCFSoftShadowMap;
@@ -868,8 +868,10 @@
   // ── Lighting — physically-based: soft even base + warm accent spots ────────────
   // Values are in physical units (inverse-square falloff), tuned so walls sit at a
   // mid-tone and the accent pools fall off naturally instead of clipping to white.
-  scene.add(new THREE.HemisphereLight(0xFFF4E6, 0x6A5238, 0.7));
-  scene.add(new THREE.AmbientLight(0xFFF2E4, 0.3));
+  // Hemisphere + ambient + the environment map do most of the room fill — these
+  // are nearly free per-pixel, unlike point lights, so we lean on them.
+  scene.add(new THREE.HemisphereLight(0xFFF4E6, 0x6A5238, 1.0));
+  scene.add(new THREE.AmbientLight(0xFFF2E4, 0.4));
 
   const housingMat = new THREE.MeshStandardMaterial({ color: 0x2A2622, roughness: 0.5, metalness: 0.6, emissive: 0xFFDCA0, emissiveIntensity: 0.5 });
   let shadowBudget = 6; // cap on shadow-casting spots (perf)
@@ -882,7 +884,7 @@
     scene.add(sp); scene.add(sp.target);
     if (shadowBudget > 0) {
       sp.castShadow = true; shadowBudget--;
-      sp.shadow.mapSize.set(2048, 2048);
+      sp.shadow.mapSize.set(1536, 1536);
       sp.shadow.camera.near = 0.5;
       sp.shadow.camera.far  = 22;
       sp.shadow.bias = -0.0005;
@@ -905,9 +907,10 @@
   // South collectors
   [-6.5, -3.5, -0.5, 2.5, 5, 7].forEach(x => spot(x, SZ - 2.6, x, SZ));
 
-  // Soft overhead fill across a grid so the floor + corners read evenly (no black corners)
-  [[-6,-7],[6,-7],[-6,7],[6,7],[0,-7],[0,7],[-6,0],[6,0],[0,0]].forEach(([x,z]) => {
-    const l = new THREE.PointLight(0xFFEAD2, 9, 30, 2);
+  // A few soft overhead pools for warmth on the floor (kept minimal — 3 instead of
+  // 9; the hemisphere/ambient/env fill handles the corners far more cheaply)
+  [[0,-6],[0,6],[0,0]].forEach(([x,z]) => {
+    const l = new THREE.PointLight(0xFFEAD2, 12, 30, 2);
     l.position.set(x, H - 0.5, z);
     scene.add(l);
   });
@@ -1038,6 +1041,11 @@
   composer.addPass(new RenderPass(scene, camera));
   composer.addPass(new UnrealBloomPass(new THREE.Vector2(innerWidth, innerHeight), 0.15, 0.4, 0.95));
   composer.addPass(new OutputPass());
+
+  // Shadows are static (nothing in the room ever moves) — render them once and
+  // freeze, instead of re-rendering all shadow maps every frame. Big FPS win.
+  renderer.shadowMap.autoUpdate = false;
+  renderer.shadowMap.needsUpdate = true;
 
   // ── Render loop ───────────────────────────────────────────────────────────────
   let prevT = performance.now();
