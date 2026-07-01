@@ -565,36 +565,44 @@
     }
   }
 
-  function makePainting(w, h, color, fi = 0) {
+  const FRAME_B  = 0.07;   // frame moulding width  (also exported for leaning maths)
+  const FRAME_D  = 0.09;   // frame depth
+
+  function makePainting(w, h, color, fi = 0, withLabel = true) {
     const g = new THREE.Group();
     const isGilt = (fi % 5) === 2;
-    // frame (slightly recessed; canvas sits proud like a stretched canvas)
-    const fm = new THREE.MeshStandardMaterial({
+    const b = FRAME_B, fd = FRAME_D;
+    const fmat = new THREE.MeshStandardMaterial({
       color: FRAMES[fi % 5], map: frameGrain,
       roughness: isGilt ? 0.35 : 0.6,
       metalness: isGilt ? 0.7  : 0.15,
       envMapIntensity: isGilt ? 1.3 : 0.5,
     });
-    const frame = new THREE.Mesh(new THREE.BoxGeometry(w + 0.14, h + 0.14, 0.05), fm);
-    frame.castShadow = true; frame.receiveShadow = true;
-    g.add(frame);
-    // inner rabbet lip
-    const lip = new THREE.Mesh(new THREE.BoxGeometry(w + 0.05, h + 0.05, 0.055),
-      new THREE.MeshStandardMaterial({ color: FRAMES[fi % 5], roughness: 0.5, metalness: isGilt ? 0.6 : 0.1, envMapIntensity: isGilt ? 1.0 : 0.4 }));
-    lip.position.z = 0.006;
-    g.add(lip);
-    // canvas face — procedural artwork by collection
+    // Four mouldings around an open centre — the moulding sits proud, so its
+    // front face (and bottom rail) is the outermost surface, like a real frame.
+    const bar = (bw, bh, bx, by) => {
+      const m = new THREE.Mesh(new THREE.BoxGeometry(bw, bh, fd), fmat);
+      m.position.set(bx, by, 0);
+      m.castShadow = true; m.receiveShadow = true;
+      g.add(m);
+    };
+    bar(w + 2 * b, b, 0,  (h + b) / 2);   // top rail
+    bar(w + 2 * b, b, 0, -(h + b) / 2);   // bottom rail
+    bar(b, h, -(w + b) / 2, 0);           // left rail
+    bar(b, h,  (w + b) / 2, 0);           // right rail
+    // Canvas — recessed inside the opening, behind the frame's front face
     const t  = paintingTexture(currentStyle, color, pSeed++);
     const cm = new THREE.MeshStandardMaterial({ map: t, roughness: 0.82, metalness: 0, envMapIntensity: 0.35 });
-    const cv = new THREE.Mesh(new THREE.BoxGeometry(w, h, 0.06), cm);
-    cv.position.z = 0.02;
-    cv.castShadow = true;
+    const cv = new THREE.Mesh(new THREE.BoxGeometry(w, h, 0.03), cm);
+    cv.position.z = -0.005;                // set back from the proud frame front
     g.add(cv);
-    // label card
-    const lm  = new THREE.MeshStandardMaterial({ color: 0xF6F3EE, roughness: 1 });
-    const lbl = new THREE.Mesh(new THREE.BoxGeometry(0.30, 0.08, 0.008), lm);
-    lbl.position.set(0, -(h/2 + 0.16), 0.03);
-    g.add(lbl);
+    // label card (skipped for leaning pieces, which would put it under the floor)
+    if (withLabel) {
+      const lm  = new THREE.MeshStandardMaterial({ color: 0xF6F3EE, roughness: 1 });
+      const lbl = new THREE.Mesh(new THREE.BoxGeometry(0.30, 0.08, 0.008), lm);
+      lbl.position.set(0, -(h / 2 + b + 0.10), fd / 2);
+      g.add(lbl);
+    }
     return g;
   }
 
@@ -611,8 +619,9 @@
 
   function lean(x, z, ry, w, h, col, fi, meta) {
     const g = new THREE.Group();
-    const p = makePainting(w, h, col, fi);
-    p.position.y = h / 2;
+    const p = makePainting(w, h, col, fi, false);
+    // lift so the frame's bottom rail — not the canvas — sits on the floor
+    p.position.y = h / 2 + FRAME_B;
     g.add(p);
     g.position.set(x, 0, z);
     g.rotation.order = 'YXZ';
@@ -755,15 +764,15 @@
   hang( 4.6, 2.60, NZ, 0, 1.45, 1.30, 0x4B2E83, 1, MASTER[4]);
   hang( 6.8, 2.45, NZ, 0, 1.35, 1.50, 0xB5651D, 0, MASTER[5]);
 
-  // Two large leaning pieces at north wall base
-  lean(-6.0, -D/2 + 0.40, 0, 1.30, 1.80, 0x6B3A2A, 0, {
+  // Two large leaning pieces at north wall base (kept below the hung art above)
+  lean(-6.0, -D/2 + 0.40, 0, 1.15, 1.30, 0x6B3A2A, 0, {
     title: 'Large Canvas — Unfinished',
     year: '2020',
     medium: 'Oil on canvas',
     size: '48 × 60 in',
     note: 'Never quite finished. Left to stand here. There\'s something in the incompleteness that feels honest.'
   });
-  lean( 5.5, -D/2 + 0.32, 0, 1.20, 1.60, 0x2F4F4F, 1, {
+  lean( 5.5, -D/2 + 0.32, 0, 1.10, 1.25, 0x2F4F4F, 1, {
     title: 'Seascape Study',
     year: '2016',
     medium: 'Oil on board',
